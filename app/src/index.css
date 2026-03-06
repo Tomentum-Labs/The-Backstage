@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 14% 96%;
+    --foreground: 0 0% 7%;
+    --card: 60 14% 96%;
+    --card-foreground: 0 0% 7%;
+    --popover: 60 14% 96%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 78 100% 62%;
+    --primary-foreground: 0 0% 7%;
+    --secondary: 60 8% 92%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 60 8% 92%;
+    --muted-foreground: 0 0% 44%;
+    --accent: 78 100% 62%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 0% / 0.08;
+    --input: 0 0% 0% / 0.08;
+    --ring: 78 100% 62%;
+    --radius: 1.25rem;
+    --sidebar-background: 60 14% 96%;
+    --sidebar-foreground: 0 0% 7%;
+    --sidebar-primary: 78 100% 62%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 60 8% 92%;
+    --sidebar-accent-foreground: 0 0% 7%;
+    --sidebar-border: 0 0% 0% / 0.08;
+    --sidebar-ring: 78 100% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  body {
+    @apply bg-offwhite text-dark font-body antialiased;
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Modern rounded rectangle design - replacing oval pills */
+  .rounded-card {
+    @apply rounded-2xl;
+  }
+  
+  .btn-primary {
+    @apply rounded-xl px-6 py-3 font-medium transition-all duration-300 bg-lime text-dark hover:bg-lime-dark hover:shadow-lg hover:shadow-lime/30 hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply rounded-xl px-6 py-3 font-medium transition-all duration-300 border border-dark/20 text-dark hover:bg-dark hover:text-offwhite;
+  }
+  
+  .card-modern {
+    @apply rounded-2xl bg-offwhite-dark border border-dark/10 p-6 transition-all duration-300 hover:shadow-card hover:-translate-y-1;
+  }
+  
+  .img-rounded {
+    @apply rounded-2xl overflow-hidden;
+  }
+  
+  .grain-overlay {
+    @apply fixed inset-0 pointer-events-none z-[9999] opacity-[0.03];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+  
+  .section-pinned {
+    @apply min-h-screen w-full relative overflow-hidden;
+  }
+  
+  .section-flowing {
+    @apply w-full relative py-20;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Gradient accents */
+  .gradient-accent {
+    @apply bg-gradient-to-br from-lime to-lime-dark;
+  }
+  
+  /* Glass effect */
+  .glass {
+    @apply bg-offwhite/80 backdrop-blur-md border border-dark/5;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-lime to-lime-dark;
+  }
+  
+  .animate-in {
+    animation: animateIn 0.6s ease-out forwards;
+  }
+  
+  @keyframes animateIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+}
+
+/* Custom scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #111111 #2f2f2f;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2f2f2f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #111111;
+  border-radius: 999px;
+  border: 2px solid #2f2f2f;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #000000;
+}
+
+.docs-theme-light,
+.docs-theme-light * {
+  scrollbar-color: #9ca3af #ffffff;
+}
+
+.docs-theme-light ::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+.docs-theme-light ::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border: 2px solid #ffffff;
+}
+
+.docs-theme-light ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Selection */
+::selection {
+  background: #B8FF3D;
+  color: #111111;
+}

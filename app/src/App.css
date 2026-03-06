@@ -1,0 +1,94 @@
+/* App-specific styles */
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure sections stack properly */
+main {
+  position: relative;
+}
+
+/* Hero section specific */
+#hero {
+  z-index: 10;
+}
+
+/* Pinned section z-index stacking */
+.section-pinned {
+  z-index: 1;
+}
+
+/* Flowing sections */
+.section-flowing {
+  z-index: 2;
+  position: relative;
+}
+
+/* Image hover effects */
+.img-rounded {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.img-rounded:hover {
+  transform: translateY(-2px);
+}
+
+/* Card hover effects */
+.card-modern:hover {
+  transform: translateY(-4px);
+}
+
+/* Button press effect */
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Pulse animation for badges */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .section-pinned {
+    min-height: 100vh;
+    height: auto;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
