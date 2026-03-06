@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
@@ -15,6 +15,8 @@ import Footer from './sections/Footer';
 import DocsPage from './pages/DocsPage';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
+import FullPageLoader from './components/FullPageLoader';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
 
 function HomePage() {
@@ -55,15 +57,33 @@ function HomePage() {
   );
 }
 
+// Blocks rendering of protected pages until the initial auth check finishes.
+// This prevents the "flash of wrong page" and eliminates per-page session checks.
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) return <FullPageLoader label="Loading..." />;
+  if (!user) return <Navigate to="/auth" replace />;
+  return <>{children}</>;
+}
+
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
-      <Route path="/docs/:sectionId" element={<DocsPage />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
+        <Route path="/docs/:sectionId" element={<DocsPage />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

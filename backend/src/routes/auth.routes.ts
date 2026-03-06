@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { type Request, type Response, Router } from 'express';
+import { OAuth2Client } from 'google-auth-library';
 import { z } from 'zod';
 import {
   ACCESS_TOKEN_MAX_AGE_MS,
@@ -10,6 +11,12 @@ import {
 import { prisma } from '../lib/prisma.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../lib/jwt.js';
 import { requireAuth } from '../middleware/auth.js';
+
+const googleOAuth2Client = new OAuth2Client(
+  env.GOOGLE_CLIENT_ID,
+  env.GOOGLE_CLIENT_SECRET,
+  env.GOOGLE_CALLBACK_URL,
+);
 
 const authRouter = Router();
 
@@ -161,6 +168,10 @@ authRouter.post('/login', async (req, res) => {
     return res.status(401).json({ message: 'Invalid email or password' });
   }
 
+  if (!user.passwordHash) {
+    return res.status(401).json({ message: 'This account uses Google sign-in. Please continue with Google.' });
+  }
+
   const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
   if (!isValidPassword) {
@@ -300,6 +311,82 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
 
   clearAuthCookies(res);
   return res.status(200).json({ message: 'Logged out' });
+});
+
+// GET /google — redirect to Google consent screen
+authRouter.get('/google', (req, res) => {
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
+    return res.status(503).json({ message: 'Google OAuth is not configured' });
+  }
+
+  const authUrl = googleOAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['openid', 'email', 'profile'],
+    prompt: 'select_account',
+  });
+
+  return res.redirect(authUrl);
+});
+
+// GET /google/callback — handle Google's redirect
+authRouter.get('/google/callback', async (req, res) => {
+  const { code, error } = req.query;
+
+  if (error || !code || typeof code !== 'string') {
+    return res.redirect(`${env.FRONTEND_URL}/auth?error=oauth_cancelled`);
+  }
+
+  try {
+    const { tokens } = await googleOAuth2Client.getToken(code);
+    googleOAuth2Client.setCredentials(tokens);
+
+    if (!tokens.id_token) {
+      return res.redirect(`${env.FRONTEND_URL}/auth?error=oauth_failed`);
+    }
+
+    const ticket = await googleOAuth2Client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) return res.redirect(`${env.FRONTEND_URL}/auth?error=oauth_failed`);
+
+    const { sub: googleId, email, name, email_verified } = payload;
+
+    if (!email_verified || !email) {
+      return res.redirect(`${env.FRONTEND_URL}/auth?error=email_not_verified`);
+    }
+
+    // Find existing user by googleId or email
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ googleId }, { email: email.toLowerCase() }] },
+    });
+
+    if (!user) {
+      // New user — create account
+      user = await prisma.user.create({
+        data: {
+          email: email.toLowerCase(),
+          name: name ?? email.split('@')[0],
+          googleId,
+          passwordHash: null,
+        },
+      });
+    } else if (!user.googleId) {
+      // Existing email/password account — link Google
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { googleId },
+      });
+    }
+
+    const sessionTokens = await issueSessionTokens({ userId: user.id, email: user.email });
+    setAuthCookies(res, sessionTokens);
+    return res.redirect(`${env.FRONTEND_URL}/dashboard`);
+  } catch {
+    return res.redirect(`${env.FRONTEND_URL}/auth?error=oauth_failed`);
+  }
 });
 
 export default authRouter;

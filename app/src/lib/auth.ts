@@ -21,15 +21,24 @@ const getJson = async <T>(response: Response): Promise<T> => {
   return body as T;
 };
 
-const refreshSession = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-  });
+// Singleton in-flight guard: concurrent callers share the same refresh request
+// so the refresh token is only consumed once.
+let refreshInFlight: Promise<void> | null = null;
 
-  if (!response.ok) {
-    throw new Error('Session expired');
+const refreshSession = (): Promise<void> => {
+  if (!refreshInFlight) {
+    refreshInFlight = fetch(`${API_BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Session expired');
+      })
+      .finally(() => {
+        refreshInFlight = null;
+      });
   }
+  return refreshInFlight;
 };
 
 export const signup = async (payload: { name: string; email: string; password: string }) => {

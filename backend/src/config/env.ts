@@ -21,6 +21,10 @@ export const env = {
   ACCESS_COOKIE_NAME: process.env.ACCESS_COOKIE_NAME ?? 'ticketlabs_access',
   REFRESH_COOKIE_NAME: process.env.REFRESH_COOKIE_NAME ?? 'ticketlabs_refresh',
   CORS_ORIGIN: process.env.CORS_ORIGIN ?? 'http://localhost:5173,http://localhost:5174',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? '',
+  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL ?? 'http://localhost:4000/api/auth/google/callback',
+  FRONTEND_URL: process.env.FRONTEND_URL ?? 'http://localhost:5173',
 };
 
 export const ACCESS_TOKEN_MAX_AGE_MS = 10 * 60 * 1000;
