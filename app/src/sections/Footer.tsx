@@ -17,19 +17,19 @@ const Footer = () => {
               <div className="w-10 h-10 bg-lime rounded-xl flex items-center justify-center">
                 <span className="font-heading font-bold text-dark text-lg">T</span>
               </div>
-              <h3 className="font-heading font-bold text-2xl text-white">
-                Ticket Labs
+              <h3 className="font-bold text-2xl text-white" style={{ fontFamily: 'Pacifico, cursive', letterSpacing: '0.06em' }}>
+                The Backstage
               </h3>
             </div>
             <p className="text-white/60 mb-6 max-w-xs">
               White-label ticketing for modern teams. Create, sell, and manage events with ease.
             </p>
             <a
-              href="mailto:hello@ticketlabs.co"
+              href="mailto:hello@thebackstage.co"
               className="flex items-center gap-2 text-white/60 hover:text-lime transition-colors mb-6"
             >
               <Mail size={18} />
-              hello@ticketlabs.co
+              hello@thebackstage.co
             </a>
 
             {/* Social Links */}
@@ -83,7 +83,7 @@ const Footer = () => {
         {/* Bottom Row */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} Ticket Labs. All rights reserved.
+            © {new Date().getFullYear()} The Backstage. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a

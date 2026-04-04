@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { login, signup } from '@/lib/auth';
+import { getMe, login, signup } from '@/lib/auth';
 import FullPageLoader from '@/components/FullPageLoader';
 import { useAuth } from '@/context/AuthContext';
 
@@ -23,6 +23,7 @@ const AuthPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [isDraggingToggle, setIsDraggingToggle] = useState(false);
   const [dragProgress, setDragProgress] = useState<number | null>(null);
   const toggleTrackRef = useRef<HTMLDivElement | null>(null);
@@ -43,10 +44,33 @@ const AuthPage = () => {
     }
   }, [searchParams]);
 
-  // While the global auth check is in progress, show the loader.
-  if (isLoading) return <FullPageLoader label="Checking session..." />;
+  // Reset the Google button if the page is restored from bfcache
+  // (user clicked Google, then hit the browser back button).
+  useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setIsGoogleLoading(false);
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
 
-  // Already authenticated — let ProtectedRoute / Navigate handle the redirect.
+  // If context says user is logged in, verify with the server before redirecting.
+  // This catches stale state from bfcache, SPA navigation after logout, etc.
+  const hasVerifiedRef = useRef(false);
+  useEffect(() => {
+    if (isLoading || !user || hasVerifiedRef.current) return;
+    hasVerifiedRef.current = true;
+    setIsVerifying(true);
+    getMe()
+      .then((profile) => setUser(profile))
+      .catch(() => setUser(null))
+      .finally(() => setIsVerifying(false));
+  }, [isLoading, user, setUser]);
+
+  // While the global auth check or server verification is in progress, show the loader.
+  if (isLoading || isVerifying) return <FullPageLoader label="Checking session..." />;
+
+  // Genuinely authenticated — redirect to dashboard.
   if (user) return <Navigate to="/dashboard" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -161,7 +185,7 @@ const AuthPage = () => {
         <div className="rounded-2xl border border-offwhite/80 bg-offwhite/50 backdrop-blur-xl p-5 md:p-6 shadow-xl">
           <div className="mb-6 text-center">
             <h1 className="font-heading font-bold text-dark text-2xl leading-tight">
-              {isLogin ? 'Welcome back' : 'Join Ticket Labs'}
+              {isLogin ? 'Welcome back' : 'Join The Backstage'}
             </h1>
             <p className="mt-1 text-sm text-dark/60">
               {isLogin ? 'Sign in to your workspace' : 'Create your professional workspace account'}
@@ -381,7 +405,7 @@ const AuthPage = () => {
             disabled={isGoogleLoading}
             onClick={() => {
               setIsGoogleLoading(true);
-              window.location.href = `${API_BASE_URL}/api/auth/google`;
+              window.location.replace(`${API_BASE_URL}/api/auth/google`);
             }}
             className="mt-3 w-full flex items-center justify-center gap-2.5 rounded-lg border border-dark/20 bg-offwhite/90 px-4 py-2.5 text-sm font-medium text-dark hover:bg-dark/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >

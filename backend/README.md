@@ -1,4 +1,4 @@
-# Ticket Labs Backend (Auth API)
+# The Backstage Backend (Auth API)
 
 JWT-based email/password authentication backend using Express + Prisma + PostgreSQL (Neon-ready) with HTTP-only cookie sessions.
 
@@ -15,7 +15,7 @@ Copy `.env.example` to `.env` and fill values:
 - `DATABASE_URL` (Neon PostgreSQL connection string)
 - `JWT_SECRET` (long random secret)
 - `PORT` (default `4000`)
-- `JWT_COOKIE_NAME` (default `ticketlabs_session`)
+- `JWT_COOKIE_NAME` (default `thebackstage_session`)
 - `CORS_ORIGIN` (default `http://localhost:5173`)
 
 ## 3) Generate Prisma client + migrate

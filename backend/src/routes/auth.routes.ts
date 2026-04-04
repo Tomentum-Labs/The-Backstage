@@ -9,7 +9,7 @@ import {
   REFRESH_TOKEN_MAX_AGE_MS,
 } from '../config/env.js';
 import { prisma } from '../lib/prisma.js';
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../lib/jwt.js';
+import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from '../lib/jwt.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const googleOAuth2Client = new OAuth2Client(
@@ -94,6 +94,26 @@ const issueSessionTokens = async (params: {
 const setAuthCookies = (res: Response, tokens: { accessToken: string; refreshToken: string }) => {
   res.cookie(env.ACCESS_COOKIE_NAME, tokens.accessToken, getAccessCookieOptions());
   res.cookie(env.REFRESH_COOKIE_NAME, tokens.refreshToken, getRefreshCookieOptions());
+};
+
+/**
+ * Check if the request has a valid authentication token.
+ * Returns true if authenticated, false otherwise.
+ */
+const isAuthenticated = (req: Request): boolean => {
+  const cookieToken = req.cookies?.[env.ACCESS_COOKIE_NAME] as string | undefined;
+  const authHeader = req.headers.authorization;
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.replace('Bearer ', '').trim() : undefined;
+  const token = cookieToken ?? bearerToken;
+
+  if (!token) return false;
+
+  try {
+    verifyAccessToken(token);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const signupSchema = z.object({
@@ -315,6 +335,11 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
 
 // GET /google — redirect to Google consent screen
 authRouter.get('/google', (req, res) => {
+  // Prevent authenticated users from initiating a new OAuth flow
+  if (isAuthenticated(req)) {
+    return res.redirect(`${env.FRONTEND_URL}/dashboard`);
+  }
+
   if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
     return res.status(503).json({ message: 'Google OAuth is not configured' });
   }
@@ -330,6 +355,12 @@ authRouter.get('/google', (req, res) => {
 
 // GET /google/callback — handle Google's redirect
 authRouter.get('/google/callback', async (req, res) => {
+  // Prevent authenticated users from processing OAuth callback
+  // (e.g., when they navigate back in browser history)
+  if (isAuthenticated(req)) {
+    return res.redirect(`${env.FRONTEND_URL}/dashboard`);
+  }
+
   const { code, error } = req.query;
 
   if (error || !code || typeof code !== 'string') {

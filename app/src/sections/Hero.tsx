@@ -51,7 +51,7 @@ const Hero = () => {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              A white-label ticketing system that looks like you built it—without
+              A white label ticketing system that looks like you built it, without
               the engineering team.
             </p>
 
@@ -82,7 +82,7 @@ const Hero = () => {
             >
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-dark/20 text-sm text-dark/60 bg-offwhite-dark">
                 <span className="w-2 h-2 rounded-full bg-lime animate-pulse" />
-                Free for first 100 tickets <span className="w-2 h-2 rounded-full bg-lime animate-pulse" /> Setup in minutes
+                AI Powered Event Management <span className="w-2 h-2 rounded-full bg-lime animate-pulse" /> Setup in minutes
               </span>
             </div>
           </div>

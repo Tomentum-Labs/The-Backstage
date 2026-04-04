@@ -91,7 +91,7 @@ const SocialProof = () => {
                   isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'
                 }`}
               >
-                "We switched to Ticket Labs and sold out our venue in 48 hours—without a single support ticket."
+                "We switched to The Backstage and sold out our venue in 48 hours—without a single support ticket."
               </p>
               
               {/* Rating */}

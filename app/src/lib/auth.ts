@@ -70,6 +70,7 @@ export const login = async (payload: { email: string; password: string }) => {
 export const getMe = async () => {
   let response = await fetch(`${API_BASE_URL}/api/auth/me`, {
     credentials: 'include',
+    cache: 'no-store',
   });
 
   if (response.status === 401) {
@@ -77,6 +78,7 @@ export const getMe = async () => {
 
     response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       credentials: 'include',
+      cache: 'no-store',
     });
   }
 

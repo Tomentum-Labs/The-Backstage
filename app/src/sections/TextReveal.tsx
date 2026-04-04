@@ -129,7 +129,7 @@ const MobileTextReveal: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-lime" />
             <span className="font-heading font-bold text-white text-sm tracking-tight">
-              Ticket Labs
+              The Backstage
             </span>
           </div>
         </div>
@@ -365,7 +365,7 @@ const DesktopTextReveal: React.FC = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-lime" />
             <span className="font-heading font-bold text-white text-sm lg:text-base tracking-tight">
-              Ticket Labs
+              The Backstage
             </span>
           </div>
         </div>

@@ -23,7 +23,7 @@ const DashboardPage = () => {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm text-dark/60">Dashboard</p>
-              <h1 className="text-3xl font-heading text-dark">Welcome to Ticket Labs</h1>
+              <h1 className="text-3xl font-heading text-dark">Welcome to The Backstage</h1>
             </div>
             <button type="button" className="btn-secondary" onClick={handleLogout}>
               Log out

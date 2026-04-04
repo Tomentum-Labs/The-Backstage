@@ -167,7 +167,12 @@ const Pricing = () => {
         </div>
 
         {/* Trust Badges */}
-        <div className="flex flex-wrap justify-center items-center gap-8 mt-12 text-dark/40 text-sm">
+        <div 
+          className={`flex flex-wrap justify-center items-center gap-8 mt-12 text-dark/40 text-sm transition-all duration-700 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+          }`}
+          style={{ transitionDelay: '300ms' }}
+        >
           <span className="flex items-center gap-2">
             <Check size={16} />
             Hybrid model: monthly + pay as you go

@@ -17,9 +17,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // One single session check for the entire app lifetime.
-    // getMe() internally handles the access-token → refresh-token flow
-    // so the refresh token is only rotated once on cold load.
     getMe()
       .then((profile) => setUser(profile))
       .catch(() => setUser(null))

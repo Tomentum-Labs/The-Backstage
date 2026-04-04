@@ -76,7 +76,7 @@ const WhyChooseUs = () => {
             }`}
             style={{ fontSize: 'clamp(32px, 3vw, 48px)' }}
           >
-            Why choose Ticket Labs?
+            Why choose The Backstage?
           </h2>
           <p
             className={`text-dark/70 text-lg max-w-3xl mx-auto transition-all duration-700 delay-100 ${
