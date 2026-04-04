@@ -37,6 +37,12 @@ const AuthPage = () => {
     confirmPassword: '',
   });
 
+  const switchAuthMode = (nextIsLogin: boolean) => {
+    setDragProgress(null);
+    setErrorMessage('');
+    setIsLogin(nextIsLogin);
+  };
+
   useEffect(() => {
     const oauthError = searchParams.get('error');
     if (oauthError) {
@@ -116,6 +122,9 @@ const AuthPage = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (errorMessage) {
+      setErrorMessage('');
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -157,7 +166,7 @@ const AuthPage = () => {
 
     if (toggleDidMoveRef.current) {
       const progress = dragProgress ?? (isLogin ? 0 : 1);
-      setIsLogin(progress < 0.5);
+      switchAuthMode(progress < 0.5);
       suppressToggleClickRef.current = true;
     }
 
@@ -213,8 +222,7 @@ const AuthPage = () => {
                   suppressToggleClickRef.current = false;
                   return;
                 }
-                setDragProgress(null);
-                setIsLogin(true);
+                switchAuthMode(true);
               }}
               className={`relative z-10 py-2 text-sm font-medium transition-colors duration-200 ${isLogin ? 'text-dark' : 'text-dark/60 hover:text-dark'}`}
             >
@@ -227,8 +235,7 @@ const AuthPage = () => {
                   suppressToggleClickRef.current = false;
                   return;
                 }
-                setDragProgress(null);
-                setIsLogin(false);
+                switchAuthMode(false);
               }}
               className={`relative z-10 py-2 text-sm font-medium transition-colors duration-200 ${!isLogin ? 'text-dark' : 'text-dark/60 hover:text-dark'}`}
             >
@@ -340,6 +347,7 @@ const AuthPage = () => {
               <div className="flex justify-end">
                 <button
                   type="button"
+                  onClick={() => navigate('/auth/forgot-password')}
                   className="text-xs text-dark/60 hover:text-dark transition-colors"
                 >
                   Forgot password?
@@ -430,7 +438,7 @@ const AuthPage = () => {
             <span className="inline-flex items-center gap-1.5">
               {isLogin ? 'No account yet?' : 'Already have an account?'}
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => switchAuthMode(!isLogin)}
                 className="font-semibold text-dark hover:underline"
               >
                 {isLogin ? 'Sign up free' : 'Log in'}

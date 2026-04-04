@@ -5,12 +5,16 @@ import { z } from 'zod';
 import {
   ACCESS_TOKEN_MAX_AGE_MS,
   env,
+  PASSWORD_RESET_TOKEN_TTL_MS,
   REFRESH_TOKEN_ABSOLUTE_MAX_AGE_MS,
   REFRESH_TOKEN_MAX_AGE_MS,
 } from '../config/env.js';
+import { sendPasswordResetEmail } from '../lib/email.js';
 import { prisma } from '../lib/prisma.js';
+import { generatePasswordResetToken, hashPasswordResetToken } from '../lib/password-reset.js';
 import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from '../lib/jwt.js';
 import { requireAuth } from '../middleware/auth.js';
+import { forgotPasswordRateLimiter, resetPasswordRateLimiter } from '../middleware/rate-limit.js';
 
 const googleOAuth2Client = new OAuth2Client(
   env.GOOGLE_CLIENT_ID,
@@ -116,20 +120,50 @@ const isAuthenticated = (req: Request): boolean => {
   }
 };
 
+const getRequesterIp = (req: Request) => {
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const firstForwarded = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor?.split(',')[0];
+  const ip = (firstForwarded ?? req.ip ?? '').trim();
+
+  return ip ? ip.slice(0, 64) : null;
+};
+
+const getPasswordResetUrl = (token: string) => {
+  try {
+    const resetUrl = new URL(env.PASSWORD_RESET_URL);
+    resetUrl.searchParams.set('token', token);
+    return resetUrl.toString();
+  } catch {
+    const separator = env.PASSWORD_RESET_URL.includes('?') ? '&' : '?';
+    return `${env.PASSWORD_RESET_URL}${separator}token=${encodeURIComponent(token)}`;
+  }
+};
+
+const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number');
+
 const signupSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().email(),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
+  password: passwordSchema,
 });
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
   password: z.string().min(1),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email(),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().trim().min(20),
+  password: passwordSchema,
 });
 
 authRouter.post('/signup', async (req, res) => {
@@ -331,6 +365,173 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
 
   clearAuthCookies(res);
   return res.status(200).json({ message: 'Logged out' });
+});
+
+authRouter.post('/password/forgot', forgotPasswordRateLimiter, async (req, res) => {
+  const parsed = forgotPasswordSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ message: parsed.error.issues[0]?.message ?? 'Invalid input' });
+  }
+
+  const email = parsed.data.email.toLowerCase();
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'No account found with this email.' });
+    }
+
+    const rawToken = generatePasswordResetToken();
+    const tokenHash = hashPasswordResetToken(rawToken);
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + PASSWORD_RESET_TOKEN_TTL_MS);
+
+    await prisma.$transaction(async (tx) => {
+      const txWithReset = tx as typeof tx & {
+        passwordResetToken: {
+          updateMany: (...args: unknown[]) => Promise<{ count: number }>;
+          create: (...args: unknown[]) => Promise<unknown>;
+        };
+      };
+
+      await txWithReset.passwordResetToken.updateMany({
+        where: {
+          userId: user.id,
+          consumedAt: null,
+        },
+        data: {
+          consumedAt: now,
+        },
+      });
+
+      await txWithReset.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt,
+          requestedIp: getRequesterIp(req),
+          requestedUserAgent: req.headers['user-agent']?.slice(0, 512) ?? null,
+        },
+      });
+    });
+
+    const resetUrl = getPasswordResetUrl(rawToken);
+    await sendPasswordResetEmail({ to: user.email, resetUrl });
+
+    return res.status(200).json({ message: 'Password reset email sent. Check your inbox.' });
+  } catch (error) {
+    if (env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.error('Failed to process forgot password request', error);
+    }
+    return res.status(503).json({ message: 'Unable to send password reset email right now. Please try again.' });
+  }
+});
+
+authRouter.post('/password/reset', resetPasswordRateLimiter, async (req, res) => {
+  const parsed = resetPasswordSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ message: parsed.error.issues[0]?.message ?? 'Invalid input' });
+  }
+
+  try {
+    const prismaWithReset = prisma as typeof prisma & {
+      passwordResetToken: {
+        findUnique: (...args: unknown[]) => Promise<
+          | {
+              id: string;
+              userId: string;
+              consumedAt: Date | null;
+              expiresAt: Date;
+            }
+          | null
+        >;
+      };
+    };
+
+    const tokenHash = hashPasswordResetToken(parsed.data.token);
+    const resetToken = await prismaWithReset.passwordResetToken.findUnique({
+      where: { tokenHash },
+      select: {
+        id: true,
+        userId: true,
+        consumedAt: true,
+        expiresAt: true,
+      },
+    });
+
+    if (!resetToken || resetToken.consumedAt || resetToken.expiresAt <= new Date()) {
+      return res.status(400).json({ message: 'This reset link is invalid or has expired.' });
+    }
+
+    const nextPasswordHash = await bcrypt.hash(parsed.data.password, 12);
+    const now = new Date();
+
+    const txResult = await prisma.$transaction(async (tx) => {
+      const txWithReset = tx as typeof tx & {
+        passwordResetToken: {
+          updateMany: (...args: unknown[]) => Promise<{ count: number }>;
+        };
+      };
+
+      const consumeResult = await txWithReset.passwordResetToken.updateMany({
+        where: {
+          id: resetToken.id,
+          consumedAt: null,
+          expiresAt: { gt: now },
+        },
+        data: { consumedAt: now },
+      });
+
+      if (consumeResult.count !== 1) {
+        return { tokenConsumed: false as const };
+      }
+
+      await tx.user.update({
+        where: { id: resetToken.userId },
+        data: { passwordHash: nextPasswordHash },
+      });
+
+      await tx.refreshSession.updateMany({
+        where: {
+          userId: resetToken.userId,
+          revokedAt: null,
+        },
+        data: { revokedAt: now },
+      });
+
+      await txWithReset.passwordResetToken.updateMany({
+        where: {
+          userId: resetToken.userId,
+          consumedAt: null,
+        },
+        data: {
+          consumedAt: now,
+        },
+      });
+
+      return { tokenConsumed: true as const };
+    });
+
+    if (!txResult.tokenConsumed) {
+      return res.status(400).json({ message: 'This reset link is invalid or has expired.' });
+    }
+  } catch (error) {
+    if (env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.error('Failed to process reset password request', error);
+    }
+    return res.status(503).json({ message: 'Password reset is temporarily unavailable. Please try again later.' });
+  }
+
+  clearAuthCookies(res);
+  return res.status(200).json({ message: 'Password reset successful. Please sign in again.' });
 });
 
 // GET /google — redirect to Google consent screen

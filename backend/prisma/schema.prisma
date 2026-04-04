@@ -14,6 +14,7 @@ model User {
   passwordHash String?
   googleId     String?          @unique
   sessions     RefreshSession[]
+  passwordResetTokens PasswordResetToken[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 }
@@ -33,4 +34,20 @@ model RefreshSession {
   @@index([userId])
   @@index([userId, familyId])
   @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash        String   @unique
+  expiresAt        DateTime
+  consumedAt       DateTime?
+  requestedIp      String?
+  requestedUserAgent String?
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([consumedAt])
 }

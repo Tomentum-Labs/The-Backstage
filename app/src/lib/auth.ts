@@ -94,3 +94,29 @@ export const logout = async () => {
 
   return getJson<{ message: string }>(response);
 };
+
+export const requestPasswordReset = async (payload: { email: string }) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/password/forgot`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return getJson<{ message: string }>(response);
+};
+
+export const resetPassword = async (payload: { token: string; password: string }) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/password/reset`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return getJson<{ message: string }>(response);
+};
