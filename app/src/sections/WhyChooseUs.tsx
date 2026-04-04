@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Percent, Wallet, Megaphone, Layers, Store, Ticket, BarChart3, ShieldCheck } from 'lucide-react';
+import { Globe, Zap, Bot, Sparkles, ShieldCheck, BarChart3, Smartphone, Users } from 'lucide-react';
 
 const WhyChooseUs = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -25,44 +25,54 @@ const WhyChooseUs = () => {
 
   const reasons = [
     {
-      icon: Percent,
-      title: 'Lowest rates in the industry',
-      description: 'Our transparent pricing ensures you keep more of your ticket revenue with no hidden fees.',
+      icon: Globe,
+      title: 'Custom White-Label Domains',
+      description: 'Sell tickets on your own custom website. Keep 100% of your brand equity and audience.',
     },
     {
-      icon: Wallet,
-      title: 'All ticket revenue directly to you',
-      description: 'Get paid instantly with direct payouts to your bank account after each ticket sale.',
+      icon: Zap,
+      title: 'Instant Direct Payouts',
+      description: 'Get paid instantly. Ticket revenue routes directly to your bank account the second a sale is made.',
     },
     {
-      icon: Layers,
-      title: 'Build, sell, and manage in one flow',
-      description: 'Create events, sell tickets, and run operations without jumping tools.',
+      icon: BarChart3,
+      title: 'Manage all in one dashboard',
+      description: 'Run campaigns, track sales, and monitor performance without switching platforms.',
     },
     {
-      icon: Store,
+      icon: Globe,
       title: 'Sell online and in person',
       description: 'Share direct checkout links online and sell physical tickets at the venue with your sales reps.',
     },
     {
-      icon: Ticket,
-      title: 'Ticketing built for real operations',
-      description: 'Handle tiers, discounts, QR check-ins, and door sales from one system.',
+      icon: Bot,
+      title: '24/7 AI Support Bot',
+      description: 'Automate customer service. Our AI bot answers attendee questions on WhatsApp 24/7 so you don\'t have to.',
     },
     {
-      icon: Megaphone,
-      title: 'Promote your own brand',
-      description: 'Own your event experience with white-label pages and branded checkout.',
-    },
-    {
-      icon: BarChart3,
-      title: 'Manage and market from one dashboard',
-      description: 'Run campaigns, track sales, and monitor performance without switching platforms.',
+      icon: Sparkles,
+      title: 'AI Marketing Co-Pilot',
+      description: 'Run effortless promotions. Let AI write your marketing copy and target the right audience for you.',
     },
     {
       icon: ShieldCheck,
-      title: 'Reliable tools for every event day',
-      description: 'Keep operations smooth with real-time visibility for your team before and during the event.',
+      title: 'Real-Time Anti Scalping',
+      description: 'Protect your fans. Stop bots and scalpers in real-time before they hijack your tickets.',
+    },
+    {
+      icon: BarChart3,
+      title: 'Automated Analytics',
+      description: 'Skip the spreadsheets. Wake up to automated, ready to read executive summaries.',
+    },
+    {
+      icon: Smartphone,
+      title: 'Lightning Fast Gate Entry',
+      description: 'Eliminate gate queues. Scan QR tickets in milliseconds using our dedicated mobile staff app.',
+    },
+    {
+      icon: Users,
+      title: 'B2B Supplier Matchmaking',
+      description: 'Find trusted partners fast. Connect instantly with verified venues, A/V suppliers, and sponsors.',
     },
   ];
 
@@ -83,7 +93,7 @@ const WhyChooseUs = () => {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
             }`}
           >
-            One platform to build, sell, manage, and market your events while keeping your brand front and center.
+            Stop renting your audience. The Backstage gives you a white-label ticketing ecosystem powered by an AI management suite to scale your event, not your overhead.
           </p>
         </div>
 
@@ -91,18 +101,20 @@ const WhyChooseUs = () => {
           {reasons.map((reason, i) => (
             <div
               key={reason.title}
-              className={`rounded-2xl bg-white border border-dark/5 p-6 shadow-[0_8px_24px_rgb(0,0,0,0.06)] transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_14px_28px_rgb(0,0,0,0.08)] ${
+              className={`group relative overflow-hidden rounded-2xl border border-lime/20 bg-white p-6 shadow-[0_8px_24px_rgb(0,0,0,0.05)] transition-all duration-500 hover:border-lime/50 hover:shadow-[0_24px_40px_-18px_rgba(163,230,53,0.45)] ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
               style={{ transitionDelay: `${(i + 1) * 100}ms` }}
             >
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-full bg-lime flex items-center justify-center shrink-0">
-                  <reason.icon size={20} className="text-dark" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-lime/15 via-lime/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+              <div className="relative z-10 flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-lime text-dark flex items-center justify-center shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-md">
+                  <reason.icon size={22} strokeWidth={2.4} />
                 </div>
                 <div>
                   <h3 className="font-heading font-bold text-dark text-xl mb-2">{reason.title}</h3>
-                  <p className="text-dark/70 leading-relaxed">{reason.description}</p>
+                  <p className="text-dark/80 leading-relaxed text-sm">{reason.description}</p>
                 </div>
               </div>
             </div>

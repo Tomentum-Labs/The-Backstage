@@ -27,17 +27,17 @@ const FeaturesOverview = () => {
     {
       icon: Zap,
       title: 'Fast checkout',
-      description: 'Apple Pay, Google Pay, cards—guests are done in seconds.',
+      description: 'Apple Pay, Google Pay, cards, guests are done in seconds.',
     },
     {
       icon: Mail,
       title: 'Instant delivery',
-      description: 'QR codes + email + wallet passes, automatically.',
+      description: 'QR codes + wallet passes, automatically.',
     },
     {
       icon: Headphones,
       title: 'Real-time support',
-      description: 'Live chat and on-call help when it matters.',
+      description: '24/7 live chat and help when it matters.',
     },
   ];
 
@@ -64,7 +64,7 @@ const FeaturesOverview = () => {
             <h2 className="font-heading font-bold text-dark mb-4" style={{ fontSize: 'clamp(28px, 2.4vw, 40px)' }}>
               Everything you need to sell tickets
             </h2>
-            <p className="text-dark/70 text-lg leading-relaxed mb-6">Sell tickets online and at the door with a single, unified system — fast checkout, instant delivery, and support when you need it.</p>
+            <p className="text-dark/70 text-lg leading-relaxed mb-6">Sell tickets online and at the door with a single unified system, fast checkout, instant delivery, and support when you need it.</p>
 
             <div className="space-y-4">
               {features.map((feature, i) => (

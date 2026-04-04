@@ -27,32 +27,32 @@ const Pricing = () => {
 
   const plans = [
     {
-      name: 'Recurring Events',
-      price: 'Monthly',
-      description: 'Flat monthly subscription for organizers running events often.',
+      name: 'Non-Ticketed Events',
+      price: 'Free',
+      period: 'forever',
+      description: '100% free setup for university societies, free workshops, and community events.',
       features: [
-        'Fixed monthly fee',
-        'Predictable monthly spend',
-        'Best for frequent organizers',
-        'Useful for monthly event cycles',
+        'Custom white-label subdomain',
+        'Zero setup fees',
+        'Basic attendee management',
+        'Freemium AI support credits',
       ],
-      cta: 'Choose monthly',
+      cta: 'Start for free',
       detailsPath: '/docs/pricing-models#monthly-subscription',
       primary: false,
     },
     {
-      name: 'One-Off Events',
-      price: '4%',
-      period: 'per sale',
-      description: 'Pay-as-you-go pricing with commission deducted on each ticket sold.',
+      name: 'Ticketed Events',
+      price: '7%',
+      period: 'per ticket sold',
+      description: 'Flat Pay-As-You-Go commission. Includes our 4% platform fee and the 3% payment gateway cost.',
       features: [
-        'No recurring subscription',
-        'Zero upfront platform risk',
-        'Fee scales with event success',
-        'Commission can be passed at checkout',
-        'Ideal for annual or one-off events',
+        'Base revenue routed instantly to your bank',
+        'Automated fee deduction via Pre-Paid Wallet',
+        'Absorb the fee or pass it to buyers',
+        'Pay-As-You-Go AI compute access',
       ],
-      cta: 'Choose pay as you go',
+      cta: 'Launch ticketed event',
       detailsPath: '/docs/pricing-models#pay-as-you-go',
       primary: true,
     },
@@ -78,7 +78,7 @@ const Pricing = () => {
             Simple Pricing
           </h2>
           <p className="text-dark/60 text-lg">
-            Choose a monthly plan for recurring events or pay as you go for one-off events.
+            Zero monthly lock-ins. Launch for free, or pay a flat commission only when you sell a ticket.
           </p>
         </div>
 
@@ -102,9 +102,9 @@ const Pricing = () => {
               {/* Popular Badge */}
               {plan.primary && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-lime text-dark text-xs font-medium rounded-full">
+                  <span className="inline-flex items-center gap-1 px-1 py-1 bg-lime text-dark text-xs font-medium rounded-full">
                     <Sparkles size={12} />
-                    Recommended for one-off events
+                    Recommended for commercial events
                   </span>
                 </div>
               )}
@@ -175,15 +175,15 @@ const Pricing = () => {
         >
           <span className="flex items-center gap-2">
             <Check size={16} />
-            Hybrid model: monthly + pay as you go
+            Zero monthly subscriptions or lock-ins
           </span>
           <span className="flex items-center gap-2">
             <Check size={16} />
-            4% commission on pay-as-you-go sales
+            Instant payouts at point of sale
           </span>
           <span className="flex items-center gap-2">
             <Check size={16} />
-            Built for recurring and one-off organizers
+            Pay-As-You-Go AI computing credits
           </span>
         </div>
       </div>

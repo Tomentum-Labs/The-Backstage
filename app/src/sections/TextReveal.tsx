@@ -111,7 +111,7 @@ const MobileTextReveal: React.FC = () => {
             className="font-heading font-black text-white text-left tracking-tight"
             style={{ fontSize: 'clamp(34px, 9vw, 60px)' }}
           >
-            Zero cuts.
+            Zero hassle.
           </h2>
         </div>
 
@@ -124,7 +124,7 @@ const MobileTextReveal: React.FC = () => {
         {/* Tagline */}
         <div ref={(el) => { linesRef.current[5] = el; }} className="mt-5 flex flex-col gap-3">
           <p className="font-body" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.32)' }}>
-            No platform fees. No revenue splits. Just you, your fans, and your tickets.
+              Zero massive teams. Zero upfront costs. Just your brand, your fans, and your tickets.
           </p>
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-lime" />
@@ -339,7 +339,7 @@ const DesktopTextReveal: React.FC = () => {
             className="font-heading font-black text-white text-left tracking-tight"
             style={{ fontSize: 'clamp(32px, 7.2vw, 105px)' }}
           >
-            Zero cuts.
+            Zero hassle.
           </h2>
         </div>
 
@@ -360,12 +360,12 @@ const DesktopTextReveal: React.FC = () => {
             className="font-body"
             style={{ fontSize: 'clamp(12px, 1.3vw, 16px)', color: 'rgba(255,255,255,0.32)', maxWidth: '28rem' }}
           >
-            No platform fees. No revenue splits. Just you, your fans, and your tickets.
+            Zero massive teams. Zero upfront costs. Just your brand, your fans, and your tickets.
           </p>
           <div className="flex items-center gap-2 flex-shrink-0">
             <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-lime" />
-            <span className="font-heading font-bold text-white text-sm lg:text-base tracking-tight">
-              The Backstage
+            <span className="font-heading font-bold text-white text-xl tracking-tight" style={{ fontFamily: 'Pacifico, cursive', letterSpacing: '0.06em' }}>
+                The Backstage
             </span>
           </div>
         </div>

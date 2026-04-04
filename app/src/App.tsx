@@ -6,6 +6,7 @@ import TextReveal from './sections/TextReveal';
 import SocialProof from './sections/SocialProof';
 import FeaturesOverview from './sections/FeaturesOverview';
 import FeatureSell from './sections/FeatureSell';
+import AIManagementSuite from './sections/AIManagementSuite';
 import FeatureDashboard from './sections/FeatureDashboard';
 import WhyChooseUs from './sections/WhyChooseUs';
 import UseCases from './sections/UseCases';
@@ -48,6 +49,7 @@ function HomePage() {
         <TextReveal />
         <FeaturesOverview />
         <FeatureSell />
+        <AIManagementSuite />
         <FeatureDashboard />
         <UseCases />
         <WhyChooseUs />
