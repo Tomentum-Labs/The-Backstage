@@ -38,7 +38,7 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Ticket Labs brand colors
+        // The Backstage brand colors
         lime: {
           DEFAULT: "#B8FF3D",
           dark: "#9ED932",

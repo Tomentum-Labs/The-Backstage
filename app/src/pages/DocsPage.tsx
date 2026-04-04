@@ -256,7 +256,7 @@ const sections: DocsSection[] = [
     category: 'Manual',
     summary: 'Compare monthly subscription and pay-as-you-go plans, with recommended wallet operations.',
     description:
-      'Ticket Labs uses a hybrid pricing model with two plan options. Recurring organizers can choose a monthly subscription, while one-off organizers can choose pay-as-you-go commission pricing.',
+      'The Backstage uses a hybrid pricing model with two plan options. Recurring organizers can choose a monthly subscription, while one-off organizers can choose pay-as-you-go commission pricing.',
     heroImage: '/hero_4.jpg',
     highlights: [
       'Monthly Subscription: fixed fee and predictable monthly recurring costs for frequent events.',
@@ -280,7 +280,7 @@ const sections: DocsSection[] = [
         description: 'Automatically applies the 4% commission deduction per sale.',
       },
       {
-        name: 'Ticket Labs Wallet',
+        name: 'The Backstage Wallet',
         description: 'Prepaid balance used to settle commission deductions in real time.',
       },
     ],
@@ -595,7 +595,7 @@ const DocsPage = () => {
               <Menu size={18} />
             </button>
             <span className={`font-heading font-bold text-lg tracking-tight ${isDark ? 'text-white' : 'text-dark'}`}>
-              Ticket Labs Docs
+              The Backstage Docs
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -804,7 +804,7 @@ const DocsPage = () => {
                       Pre Paid Wallet (Recommended)
                     </h3>
                     <p className={`${isDark ? 'text-white/80' : 'text-dark/80'} text-sm leading-relaxed mb-3`}>
-                      Organizers pre-load a Ticket Labs Wallet using a bank card. The 4% commission is deducted automatically per sale.
+                      Organizers pre-load a The Backstage Wallet using a bank card. The 4% commission is deducted automatically per sale.
                     </p>
                     <ul className={`space-y-2 text-sm ${isDark ? 'text-white/75' : 'text-dark/75'}`}>
                       <li>Helps avoid post-event settlement cash flow issues.</li>

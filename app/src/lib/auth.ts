@@ -21,15 +21,24 @@ const getJson = async <T>(response: Response): Promise<T> => {
   return body as T;
 };
 
-const refreshSession = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-  });
+// Singleton in-flight guard: concurrent callers share the same refresh request
+// so the refresh token is only consumed once.
+let refreshInFlight: Promise<void> | null = null;
 
-  if (!response.ok) {
-    throw new Error('Session expired');
+const refreshSession = (): Promise<void> => {
+  if (!refreshInFlight) {
+    refreshInFlight = fetch(`${API_BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Session expired');
+      })
+      .finally(() => {
+        refreshInFlight = null;
+      });
   }
+  return refreshInFlight;
 };
 
 export const signup = async (payload: { name: string; email: string; password: string }) => {
@@ -61,6 +70,7 @@ export const login = async (payload: { email: string; password: string }) => {
 export const getMe = async () => {
   let response = await fetch(`${API_BASE_URL}/api/auth/me`, {
     credentials: 'include',
+    cache: 'no-store',
   });
 
   if (response.status === 401) {
@@ -68,6 +78,7 @@ export const getMe = async () => {
 
     response = await fetch(`${API_BASE_URL}/api/auth/me`, {
       credentials: 'include',
+      cache: 'no-store',
     });
   }
 
@@ -79,6 +90,32 @@ export const logout = async () => {
   const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
     method: 'POST',
     credentials: 'include',
+  });
+
+  return getJson<{ message: string }>(response);
+};
+
+export const requestPasswordReset = async (payload: { email: string }) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/password/forgot`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return getJson<{ message: string }>(response);
+};
+
+export const resetPassword = async (payload: { token: string; password: string }) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/password/reset`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
   });
 
   return getJson<{ message: string }>(response);

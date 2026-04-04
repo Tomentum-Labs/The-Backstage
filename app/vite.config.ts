@@ -12,4 +12,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    // Prevent bfcache from freezing the SPA with stale auth state.
+    // Chrome/Firefox won't bfcache pages served with Cache-Control: no-store.
+    headers: {
+      'Cache-Control': 'no-store',
+    },
+  },
 });

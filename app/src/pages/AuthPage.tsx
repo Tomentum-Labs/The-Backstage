@@ -1,19 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { getMe, login, signup } from '@/lib/auth';
 import FullPageLoader from '@/components/FullPageLoader';
+import { useAuth } from '@/context/AuthContext';
 
-const MIN_LOADER_DURATION_MS = 200;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
+
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  oauth_cancelled: 'Google sign-in was cancelled.',
+  oauth_failed: 'Google sign-in failed. Please try again.',
+  email_not_verified: 'Your Google account email is not verified.',
+};
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user, isLoading, setUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [isDraggingToggle, setIsDraggingToggle] = useState(false);
   const [dragProgress, setDragProgress] = useState<number | null>(null);
   const toggleTrackRef = useRef<HTMLDivElement | null>(null);
@@ -27,33 +37,47 @@ const AuthPage = () => {
     confirmPassword: '',
   });
 
+  const switchAuthMode = (nextIsLogin: boolean) => {
+    setDragProgress(null);
+    setErrorMessage('');
+    setIsLogin(nextIsLogin);
+  };
+
   useEffect(() => {
-    const checkSession = async () => {
-      const startedAt = Date.now();
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      setErrorMessage(OAUTH_ERROR_MESSAGES[oauthError] ?? 'Authentication failed. Please try again.');
+    }
+  }, [searchParams]);
 
-      try {
-        await getMe();
-        navigate('/dashboard', { replace: true });
-      } catch {
-        // no active session, keep auth page
-      } finally {
-        const elapsed = Date.now() - startedAt;
-        const remaining = Math.max(0, MIN_LOADER_DURATION_MS - elapsed);
-
-        if (remaining > 0) {
-          await new Promise((resolve) => setTimeout(resolve, remaining));
-        }
-
-        setIsCheckingSession(false);
-      }
+  // Reset the Google button if the page is restored from bfcache
+  // (user clicked Google, then hit the browser back button).
+  useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setIsGoogleLoading(false);
     };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
 
-    void checkSession();
-  }, [navigate]);
+  // If context says user is logged in, verify with the server before redirecting.
+  // This catches stale state from bfcache, SPA navigation after logout, etc.
+  const hasVerifiedRef = useRef(false);
+  useEffect(() => {
+    if (isLoading || !user || hasVerifiedRef.current) return;
+    hasVerifiedRef.current = true;
+    setIsVerifying(true);
+    getMe()
+      .then((profile) => setUser(profile))
+      .catch(() => setUser(null))
+      .finally(() => setIsVerifying(false));
+  }, [isLoading, user, setUser]);
 
-  if (isCheckingSession) {
-    return <FullPageLoader label="Checking session..." />;
-  }
+  // While the global auth check or server verification is in progress, show the loader.
+  if (isLoading || isVerifying) return <FullPageLoader label="Checking session..." />;
+
+  // Genuinely authenticated — redirect to dashboard.
+  if (user) return <Navigate to="/dashboard" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,16 +98,18 @@ const AuthPage = () => {
       setIsSubmitting(true);
 
       if (isLogin) {
-        await login({
+        const { user: loggedInUser } = await login({
             email: formData.email,
             password: formData.password,
           });
+        setUser(loggedInUser);
       } else {
-        await signup({
+        const { user: createdUser } = await signup({
             name: formData.name,
             email: formData.email,
             password: formData.password,
           });
+        setUser(createdUser);
       }
 
       navigate('/dashboard', { replace: true });
@@ -96,6 +122,9 @@ const AuthPage = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (errorMessage) {
+      setErrorMessage('');
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -137,7 +166,7 @@ const AuthPage = () => {
 
     if (toggleDidMoveRef.current) {
       const progress = dragProgress ?? (isLogin ? 0 : 1);
-      setIsLogin(progress < 0.5);
+      switchAuthMode(progress < 0.5);
       suppressToggleClickRef.current = true;
     }
 
@@ -165,7 +194,7 @@ const AuthPage = () => {
         <div className="rounded-2xl border border-offwhite/80 bg-offwhite/50 backdrop-blur-xl p-5 md:p-6 shadow-xl">
           <div className="mb-6 text-center">
             <h1 className="font-heading font-bold text-dark text-2xl leading-tight">
-              {isLogin ? 'Welcome back' : 'Join Ticket Labs'}
+              {isLogin ? 'Welcome back' : 'Join The Backstage'}
             </h1>
             <p className="mt-1 text-sm text-dark/60">
               {isLogin ? 'Sign in to your workspace' : 'Create your professional workspace account'}
@@ -193,8 +222,7 @@ const AuthPage = () => {
                   suppressToggleClickRef.current = false;
                   return;
                 }
-                setDragProgress(null);
-                setIsLogin(true);
+                switchAuthMode(true);
               }}
               className={`relative z-10 py-2 text-sm font-medium transition-colors duration-200 ${isLogin ? 'text-dark' : 'text-dark/60 hover:text-dark'}`}
             >
@@ -207,8 +235,7 @@ const AuthPage = () => {
                   suppressToggleClickRef.current = false;
                   return;
                 }
-                setDragProgress(null);
-                setIsLogin(false);
+                switchAuthMode(false);
               }}
               className={`relative z-10 py-2 text-sm font-medium transition-colors duration-200 ${!isLogin ? 'text-dark' : 'text-dark/60 hover:text-dark'}`}
             >
@@ -320,6 +347,7 @@ const AuthPage = () => {
               <div className="flex justify-end">
                 <button
                   type="button"
+                  onClick={() => navigate('/auth/forgot-password')}
                   className="text-xs text-dark/60 hover:text-dark transition-colors"
                 >
                   Forgot password?
@@ -372,12 +400,45 @@ const AuthPage = () => {
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="mt-4 flex items-center gap-3">
+            <div className="flex-1 h-px bg-dark/10" />
+            <span className="text-xs text-dark/40 font-medium">or</span>
+            <div className="flex-1 h-px bg-dark/10" />
+          </div>
+
+          {/* Google OAuth Button */}
+          <button
+            type="button"
+            disabled={isGoogleLoading}
+            onClick={() => {
+              setIsGoogleLoading(true);
+              window.location.replace(`${API_BASE_URL}/api/auth/google`);
+            }}
+            className="mt-3 w-full flex items-center justify-center gap-2.5 rounded-lg border border-dark/20 bg-offwhite/90 px-4 py-2.5 text-sm font-medium text-dark hover:bg-dark/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGoogleLoading ? (
+              <svg className="w-4 h-4 animate-spin text-dark/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+              </svg>
+            )}
+            {isGoogleLoading ? 'Redirecting...' : 'Continue with Google'}
+          </button>
+
           {/* Additional Info */}
           <div className="mt-5 text-center text-sm text-dark/65">
             <span className="inline-flex items-center gap-1.5">
               {isLogin ? 'No account yet?' : 'Already have an account?'}
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => switchAuthMode(!isLogin)}
                 className="font-semibold text-dark hover:underline"
               >
                 {isLogin ? 'Sign up free' : 'Log in'}

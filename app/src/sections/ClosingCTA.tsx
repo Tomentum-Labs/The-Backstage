@@ -122,7 +122,7 @@ const ClosingCTA = () => {
               {/* Testimonial */}
               <div className="mt-8 pt-6 border-t border-white/10">
                 <p className="text-white/70 text-sm italic mb-4">
-                  "Ticket Labs transformed how we sell tickets. The white-label solution 
+                  "The Backstage transformed how we sell tickets. The white-label solution 
                   made it feel like our own platform."
                 </p>
                 <div className="flex items-center gap-3">

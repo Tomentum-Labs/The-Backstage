@@ -60,7 +60,7 @@ const Navigation = ({ scrollY }: NavigationProps) => {
               goHome();
             }}
           >
-            Ticket Labs
+            The Backstage
           </a>
 
           {/* Desktop Navigation */}

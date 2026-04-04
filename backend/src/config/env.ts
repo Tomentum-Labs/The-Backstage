@@ -18,15 +18,25 @@ export const env = {
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET ?? (process.env.JWT_SECRET as string),
   ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN ?? '10m',
   REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN ?? '7d',
-  ACCESS_COOKIE_NAME: process.env.ACCESS_COOKIE_NAME ?? 'ticketlabs_access',
-  REFRESH_COOKIE_NAME: process.env.REFRESH_COOKIE_NAME ?? 'ticketlabs_refresh',
+  ACCESS_COOKIE_NAME: process.env.ACCESS_COOKIE_NAME ?? 'thebackstage_access',
+  REFRESH_COOKIE_NAME: process.env.REFRESH_COOKIE_NAME ?? 'thebackstage_refresh',
   CORS_ORIGIN: process.env.CORS_ORIGIN ?? 'http://localhost:5173,http://localhost:5174',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? '',
+  GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL ?? 'http://localhost:4000/api/auth/google/callback',
+  FRONTEND_URL: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+  RESEND_API_KEY: process.env.RESEND_API_KEY ?? '',
+  EMAIL_FROM: process.env.EMAIL_FROM ?? 'The Backstage <no-reply@example.com>',
+  PASSWORD_RESET_URL: process.env.PASSWORD_RESET_URL ?? `${process.env.FRONTEND_URL ?? 'http://localhost:5173'}/auth/reset-password`,
+  PASSWORD_RESET_TOKEN_TTL_MINUTES: Number(process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES ?? 30),
 };
 
 export const ACCESS_TOKEN_MAX_AGE_MS = 10 * 60 * 1000;
 export const REFRESH_TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 export const REFRESH_TOKEN_ABSOLUTE_MAX_AGE_MS =
   Number(process.env.REFRESH_TOKEN_ABSOLUTE_DAYS ?? 30) * 24 * 60 * 60 * 1000;
+
+export const PASSWORD_RESET_TOKEN_TTL_MS = env.PASSWORD_RESET_TOKEN_TTL_MINUTES * 60 * 1000;
 
 export const corsOrigins = env.CORS_ORIGIN.split(',')
   .map((origin) => origin.trim())
@@ -43,3 +53,7 @@ const validateSecret = (secret: string, keyName: string) => {
 
 validateSecret(env.ACCESS_TOKEN_SECRET, 'ACCESS_TOKEN_SECRET');
 validateSecret(env.REFRESH_TOKEN_SECRET, 'REFRESH_TOKEN_SECRET');
+
+if (!Number.isFinite(env.PASSWORD_RESET_TOKEN_TTL_MINUTES) || env.PASSWORD_RESET_TOKEN_TTL_MINUTES <= 0) {
+  throw new Error('PASSWORD_RESET_TOKEN_TTL_MINUTES must be a positive number');
+}
