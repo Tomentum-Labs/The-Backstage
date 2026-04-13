@@ -1,20 +1,28 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'node:crypto';
 import { type Request, type Response, Router } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { z } from 'zod';
 import {
   ACCESS_TOKEN_MAX_AGE_MS,
+  EMAIL_VERIFICATION_TOKEN_TTL_MS,
   env,
   PASSWORD_RESET_TOKEN_TTL_MS,
   REFRESH_TOKEN_ABSOLUTE_MAX_AGE_MS,
   REFRESH_TOKEN_MAX_AGE_MS,
 } from '../config/env.js';
-import { sendPasswordResetEmail } from '../lib/email.js';
+import { sendEmailVerificationEmail, sendPasswordResetEmail } from '../lib/email.js';
 import { prisma } from '../lib/prisma.js';
 import { generatePasswordResetToken, hashPasswordResetToken } from '../lib/password-reset.js';
 import { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from '../lib/jwt.js';
 import { requireAuth } from '../middleware/auth.js';
-import { forgotPasswordRateLimiter, resetPasswordRateLimiter } from '../middleware/rate-limit.js';
+import {
+  forgotPasswordRateLimiter,
+  loginPerEmailRateLimiter,
+  refreshRateLimiter,
+  resetPasswordRateLimiter,
+  signupRateLimiter,
+} from '../middleware/rate-limit.js';
 
 const googleOAuth2Client = new OAuth2Client(
   env.GOOGLE_CLIENT_ID,
@@ -62,29 +70,26 @@ const issueSessionTokens = async (params: {
   familyId?: string;
   absoluteExpiresAt?: Date;
 }) => {
-  const session = await prisma.refreshSession.create({
-    data: {
-      userId: params.userId,
-      familyId: params.familyId,
-      tokenHash: '',
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS),
-      absoluteExpiresAt: params.absoluteExpiresAt ?? new Date(Date.now() + REFRESH_TOKEN_ABSOLUTE_MAX_AGE_MS),
-    },
-    select: {
-      id: true,
-    },
-  });
+  const sessionId = crypto.randomUUID();
 
-  const refreshToken = signRefreshToken({
-    userId: params.userId,
-    sessionId: session.id,
-  });
+  const absoluteExpiresAt = params.absoluteExpiresAt ?? new Date(Date.now() + REFRESH_TOKEN_ABSOLUTE_MAX_AGE_MS);
+
+  const refreshToken = signRefreshToken(
+    { userId: params.userId, sessionId },
+    absoluteExpiresAt,
+  );
 
   const tokenHash = await bcrypt.hash(refreshToken, 12);
 
-  await prisma.refreshSession.update({
-    where: { id: session.id },
-    data: { tokenHash },
+  await prisma.refreshSession.create({
+    data: {
+      id: sessionId,
+      userId: params.userId,
+      familyId: params.familyId,
+      tokenHash,
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS),
+      absoluteExpiresAt,
+    },
   });
 
   const accessToken = signAccessToken({
@@ -92,7 +97,7 @@ const issueSessionTokens = async (params: {
     email: params.email,
   });
 
-  return { accessToken, refreshToken, sessionId: session.id };
+  return { accessToken, refreshToken, sessionId };
 };
 
 const setAuthCookies = (res: Response, tokens: { accessToken: string; refreshToken: string }) => {
@@ -128,6 +133,17 @@ const getRequesterIp = (req: Request) => {
   return ip ? ip.slice(0, 64) : null;
 };
 
+const getEmailVerificationUrl = (token: string) => {
+  try {
+    const url = new URL(env.EMAIL_VERIFICATION_URL);
+    url.searchParams.set('token', token);
+    return url.toString();
+  } catch {
+    const separator = env.EMAIL_VERIFICATION_URL.includes('?') ? '&' : '?';
+    return `${env.EMAIL_VERIFICATION_URL}${separator}token=${encodeURIComponent(token)}`;
+  }
+};
+
 const getPasswordResetUrl = (token: string) => {
   try {
     const resetUrl = new URL(env.PASSWORD_RESET_URL);
@@ -138,6 +154,46 @@ const getPasswordResetUrl = (token: string) => {
     return `${env.PASSWORD_RESET_URL}${separator}token=${encodeURIComponent(token)}`;
   }
 };
+
+/** Creates a fresh EmailVerification record and sends the email. Fire-and-forget safe. */
+const issueEmailVerification = async (userId: string, email: string) => {
+  const rawToken = generatePasswordResetToken(); // same secure random bytes approach
+  const tokenHash = hashPasswordResetToken(rawToken);
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + EMAIL_VERIFICATION_TOKEN_TTL_MS);
+
+  // Invalidate any outstanding tokens for this user first
+  await prisma.emailVerification.updateMany({
+    where: { userId, consumedAt: null },
+    data: { consumedAt: now },
+  });
+
+  await prisma.emailVerification.create({
+    data: { userId, tokenHash, expiresAt },
+  });
+
+  const verifyUrl = getEmailVerificationUrl(rawToken);
+  await sendEmailVerificationEmail({ to: email, verifyUrl });
+};
+
+// Reusable Prisma cast for PasswordResetToken (model added via db push — Prisma type inference applies)
+type PrismaWithReset = typeof prisma & {
+  passwordResetToken: {
+    findUnique: (...args: unknown[]) => Promise<
+      | {
+          id: string;
+          userId: string;
+          consumedAt: Date | null;
+          expiresAt: Date;
+        }
+      | null
+    >;
+    updateMany: (...args: unknown[]) => Promise<{ count: number }>;
+    create: (...args: unknown[]) => Promise<unknown>;
+  };
+};
+
+const prismaWithReset = prisma as PrismaWithReset;
 
 const passwordSchema = z
   .string()
@@ -166,7 +222,7 @@ const resetPasswordSchema = z.object({
   password: passwordSchema,
 });
 
-authRouter.post('/signup', async (req, res) => {
+authRouter.post('/signup', signupRateLimiter, async (req, res) => {
   const parsed = signupSchema.safeParse(req.body);
 
   if (!parsed.success) {
@@ -199,13 +255,17 @@ authRouter.post('/signup', async (req, res) => {
     },
   });
 
-  const tokens = await issueSessionTokens({ userId: user.id, email: user.email });
-  setAuthCookies(res, tokens);
+  // Send verification email — do not issue session tokens until email is confirmed
+  await issueEmailVerification(user.id, user.email);
 
-  return res.status(201).json({ user });
+  return res.status(201).json({
+    message: 'Account created. Please check your email to verify your address.',
+    needsVerification: true,
+    email: user.email,
+  });
 });
 
-authRouter.post('/login', async (req, res) => {
+authRouter.post('/login', loginPerEmailRateLimiter, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
 
   if (!parsed.success) {
@@ -216,6 +276,14 @@ authRouter.post('/login', async (req, res) => {
 
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      passwordHash: true,
+      emailVerifiedAt: true,
+      createdAt: true,
+    },
   });
 
   if (!user) {
@@ -232,6 +300,15 @@ authRouter.post('/login', async (req, res) => {
     return res.status(401).json({ message: 'Invalid email or password' });
   }
 
+  // Block unverified accounts — prompt to resend
+  if (!user.emailVerifiedAt) {
+    return res.status(403).json({
+      code: 'needs_verification',
+      message: 'Please verify your email address before signing in.',
+      email: user.email,
+    });
+  }
+
   const tokens = await issueSessionTokens({ userId: user.id, email: user.email });
   setAuthCookies(res, tokens);
 
@@ -241,6 +318,7 @@ authRouter.post('/login', async (req, res) => {
       name: user.name,
       email: user.email,
       createdAt: user.createdAt,
+      emailVerifiedAt: user.emailVerifiedAt,
     },
   });
 });
@@ -258,6 +336,7 @@ authRouter.get('/me', requireAuth, async (req, res) => {
       id: true,
       name: true,
       email: true,
+      emailVerifiedAt: true,
       createdAt: true,
     },
   });
@@ -269,7 +348,7 @@ authRouter.get('/me', requireAuth, async (req, res) => {
   return res.json({ user });
 });
 
-authRouter.post('/refresh', async (req, res) => {
+authRouter.post('/refresh', refreshRateLimiter, async (req, res) => {
   const refreshToken = req.cookies?.[env.REFRESH_COOKIE_NAME] as string | undefined;
 
   if (!refreshToken) {
@@ -279,19 +358,31 @@ authRouter.post('/refresh', async (req, res) => {
 
   try {
     const payload = verifyRefreshToken(refreshToken);
+    const now = new Date();
 
     const session = await prisma.refreshSession.findUnique({
       where: { id: payload.sessionId },
       include: { user: true },
     });
 
-    if (
-      !session ||
-      session.userId !== payload.userId ||
-      session.revokedAt ||
-      session.expiresAt <= new Date() ||
-      session.absoluteExpiresAt <= new Date()
-    ) {
+    if (!session || session.userId !== payload.userId) {
+      clearAuthCookies(res);
+      return res.status(401).json({ message: 'Invalid refresh session' });
+    }
+
+    if (session.revokedAt || session.expiresAt <= now || session.absoluteExpiresAt <= now) {
+      // A stale/reused refresh token indicates suspicious replay: revoke any still-active tokens in this family.
+      await prisma.refreshSession.updateMany({
+        where: {
+          userId: session.userId,
+          familyId: session.familyId,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt: now,
+        },
+      });
+
       clearAuthCookies(res);
       return res.status(401).json({ message: 'Invalid refresh session' });
     }
@@ -325,6 +416,17 @@ authRouter.post('/refresh', async (req, res) => {
     });
 
     if (revokeResult.count !== 1) {
+      await prisma.refreshSession.updateMany({
+        where: {
+          userId: session.userId,
+          familyId: session.familyId,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt: new Date(),
+        },
+      });
+
       clearAuthCookies(res);
       return res.status(401).json({ message: 'Refresh token already used' });
     }
@@ -376,6 +478,12 @@ authRouter.post('/password/forgot', forgotPasswordRateLimiter, async (req, res) 
 
   const email = parsed.data.email.toLowerCase();
 
+  // Always return the same message regardless of whether the email exists
+  // to prevent user enumeration attacks
+  const genericResponse = {
+    message: "If an account exists with that email, you'll receive a reset link shortly.",
+  };
+
   try {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -383,7 +491,7 @@ authRouter.post('/password/forgot', forgotPasswordRateLimiter, async (req, res) 
     });
 
     if (!user) {
-      return res.status(404).json({ message: 'No account found with this email.' });
+      return res.status(200).json(genericResponse);
     }
 
     const rawToken = generatePasswordResetToken();
@@ -423,7 +531,7 @@ authRouter.post('/password/forgot', forgotPasswordRateLimiter, async (req, res) 
     const resetUrl = getPasswordResetUrl(rawToken);
     await sendPasswordResetEmail({ to: user.email, resetUrl });
 
-    return res.status(200).json({ message: 'Password reset email sent. Check your inbox.' });
+    return res.status(200).json(genericResponse);
   } catch (error) {
     if (env.NODE_ENV !== 'production') {
       // eslint-disable-next-line no-console
@@ -431,6 +539,24 @@ authRouter.post('/password/forgot', forgotPasswordRateLimiter, async (req, res) 
     }
     return res.status(503).json({ message: 'Unable to send password reset email right now. Please try again.' });
   }
+});
+
+// GET /password/reset/validate — lightweight token check before the user fills in the form
+authRouter.get('/password/reset/validate', resetPasswordRateLimiter, async (req, res) => {
+  const token = req.query.token;
+
+  if (!token || typeof token !== 'string' || token.length < 20) {
+    return res.status(400).json({ valid: false });
+  }
+
+  const tokenHash = hashPasswordResetToken(token);
+  const resetToken = await prismaWithReset.passwordResetToken.findUnique({
+    where: { tokenHash },
+    select: { consumedAt: true, expiresAt: true },
+  });
+
+  const valid = !!resetToken && !resetToken.consumedAt && resetToken.expiresAt > new Date();
+  return res.status(valid ? 200 : 400).json({ valid });
 });
 
 authRouter.post('/password/reset', resetPasswordRateLimiter, async (req, res) => {
@@ -441,20 +567,6 @@ authRouter.post('/password/reset', resetPasswordRateLimiter, async (req, res) =>
   }
 
   try {
-    const prismaWithReset = prisma as typeof prisma & {
-      passwordResetToken: {
-        findUnique: (...args: unknown[]) => Promise<
-          | {
-              id: string;
-              userId: string;
-              consumedAt: Date | null;
-              expiresAt: Date;
-            }
-          | null
-        >;
-      };
-    };
-
     const tokenHash = hashPasswordResetToken(parsed.data.token);
     const resetToken = await prismaWithReset.passwordResetToken.findUnique({
       where: { tokenHash },
@@ -495,7 +607,11 @@ authRouter.post('/password/reset', resetPasswordRateLimiter, async (req, res) =>
 
       await tx.user.update({
         where: { id: resetToken.userId },
-        data: { passwordHash: nextPasswordHash },
+        data: {
+          passwordHash: nextPasswordHash,
+          // Invalidate all access tokens issued before this moment
+          accessTokenRevokedAt: now,
+        },
       });
 
       await tx.refreshSession.updateMany({
@@ -534,6 +650,93 @@ authRouter.post('/password/reset', resetPasswordRateLimiter, async (req, res) =>
   return res.status(200).json({ message: 'Password reset successful. Please sign in again.' });
 });
 
+// GET /email/verify?token=... — consume the verification token and mark the user verified
+authRouter.get('/email/verify', async (req, res) => {
+  const token = req.query.token;
+
+  if (!token || typeof token !== 'string' || token.length < 20) {
+    return res.redirect(`${env.FRONTEND_URL}/auth/verify-email?error=invalid_token`);
+  }
+
+  const tokenHash = hashPasswordResetToken(token);
+  const record = await prisma.emailVerification.findUnique({
+    where: { tokenHash },
+    select: { id: true, userId: true, consumedAt: true, expiresAt: true },
+  });
+
+  if (!record || record.consumedAt || record.expiresAt <= new Date()) {
+    return res.redirect(`${env.FRONTEND_URL}/auth/verify-email?error=invalid_token`);
+  }
+
+  const now = new Date();
+
+  const txResult = await prisma.$transaction(async (tx) => {
+    const consumeResult = await tx.emailVerification.updateMany({
+      where: { id: record.id, consumedAt: null, expiresAt: { gt: now } },
+      data: { consumedAt: now },
+    });
+
+    if (consumeResult.count !== 1) return { ok: false as const };
+
+    const user = await tx.user.update({
+      where: { id: record.userId },
+      data: { emailVerifiedAt: now },
+      select: { id: true, name: true, email: true, emailVerifiedAt: true, createdAt: true },
+    });
+
+    return { ok: true as const, user };
+  });
+
+  if (!txResult.ok) {
+    return res.redirect(`${env.FRONTEND_URL}/auth/verify-email?error=invalid_token`);
+  }
+
+  const tokens = await issueSessionTokens({
+    userId: txResult.user.id,
+    email: txResult.user.email,
+  });
+  setAuthCookies(res, tokens);
+
+  return res.redirect(`${env.FRONTEND_URL}/dashboard?verified=1`);
+});
+
+// POST /email/resend — resend a verification email for an unverified account
+authRouter.post('/email/resend', forgotPasswordRateLimiter, async (req, res) => {
+  const parsed = forgotPasswordSchema.safeParse(req.body);
+
+  if (!parsed.success) {
+    return res.status(400).json({ message: parsed.error.issues[0]?.message ?? 'Invalid input' });
+  }
+
+  const email = parsed.data.email.toLowerCase();
+
+  // Always return the same response to prevent enumeration
+  const genericResponse = {
+    message: "If that email is registered and unverified, you'll receive a new verification link shortly.",
+  };
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, emailVerifiedAt: true },
+    });
+
+    // No user, or already verified — return generic response either way
+    if (!user || user.emailVerifiedAt) {
+      return res.status(200).json(genericResponse);
+    }
+
+    await issueEmailVerification(user.id, user.email);
+    return res.status(200).json(genericResponse);
+  } catch (error) {
+    if (env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.error('Failed to resend verification email', error);
+    }
+    return res.status(503).json({ message: 'Unable to resend verification email right now. Please try again.' });
+  }
+});
+
 // GET /google — redirect to Google consent screen
 authRouter.get('/google', (req, res) => {
   // Prevent authenticated users from initiating a new OAuth flow
@@ -545,10 +748,22 @@ authRouter.get('/google', (req, res) => {
     return res.status(503).json({ message: 'Google OAuth is not configured' });
   }
 
+  // Generate CSRF state token and store in signed httpOnly cookie
+  const oauthState = crypto.randomBytes(32).toString('base64url');
+
+  res.cookie('oauth_state', oauthState, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 10 * 60 * 1000, // 10 minutes — enough for the OAuth round-trip
+    signed: true,
+  });
+
   const authUrl = googleOAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: ['openid', 'email', 'profile'],
     prompt: 'select_account',
+    state: oauthState,
   });
 
   return res.redirect(authUrl);
@@ -557,12 +772,24 @@ authRouter.get('/google', (req, res) => {
 // GET /google/callback — handle Google's redirect
 authRouter.get('/google/callback', async (req, res) => {
   // Prevent authenticated users from processing OAuth callback
-  // (e.g., when they navigate back in browser history)
   if (isAuthenticated(req)) {
     return res.redirect(`${env.FRONTEND_URL}/dashboard`);
   }
 
-  const { code, error } = req.query;
+  const { code, error, state } = req.query;
+
+  // Verify CSRF state — read and immediately clear the signed cookie
+  const storedState = req.signedCookies?.oauth_state as string | undefined;
+  res.clearCookie('oauth_state', {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    signed: true,
+  });
+
+  if (!storedState || typeof state !== 'string' || storedState !== state) {
+    return res.redirect(`${env.FRONTEND_URL}/auth?error=oauth_state_mismatch`);
+  }
 
   if (error || !code || typeof code !== 'string') {
     return res.redirect(`${env.FRONTEND_URL}/auth?error=oauth_cancelled`);
@@ -595,21 +822,30 @@ authRouter.get('/google/callback', async (req, res) => {
       where: { OR: [{ googleId }, { email: email.toLowerCase() }] },
     });
 
+    const now = new Date();
+
     if (!user) {
-      // New user — create account
+      // New user — create account. Google guarantees email_verified, so mark verified immediately.
       user = await prisma.user.create({
         data: {
           email: email.toLowerCase(),
           name: name ?? email.split('@')[0],
           googleId,
           passwordHash: null,
+          emailVerifiedAt: now,
         },
       });
     } else if (!user.googleId) {
-      // Existing email/password account — link Google
+      // Existing email/password account — link Google and mark email verified
       user = await prisma.user.update({
         where: { id: user.id },
-        data: { googleId },
+        data: { googleId, emailVerifiedAt: user.emailVerifiedAt ?? now },
+      });
+    } else if (!user.emailVerifiedAt) {
+      // Existing Google account missing verification timestamp — backfill it
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerifiedAt: now },
       });
     }
 

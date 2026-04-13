@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { getMe, login, signup } from '@/lib/auth';
+import { signupSchema } from '@/lib/validation';
 import FullPageLoader from '@/components/FullPageLoader';
 import { useAuth } from '@/context/AuthContext';
 
@@ -11,6 +12,8 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
   oauth_cancelled: 'Google sign-in was cancelled.',
   oauth_failed: 'Google sign-in failed. Please try again.',
   email_not_verified: 'Your Google account email is not verified.',
+  oauth_state_mismatch: 'Sign-in request was invalid. Please try again.',
+  needs_verification: 'Please verify your email address before signing in.',
 };
 
 const AuthPage = () => {
@@ -66,11 +69,13 @@ const AuthPage = () => {
   useEffect(() => {
     if (isLoading || !user || hasVerifiedRef.current) return;
     hasVerifiedRef.current = true;
+    let cancelled = false;
     setIsVerifying(true);
     getMe()
-      .then((profile) => setUser(profile))
-      .catch(() => setUser(null))
-      .finally(() => setIsVerifying(false));
+      .then((profile) => { if (!cancelled) setUser(profile); })
+      .catch(() => { if (!cancelled) setUser(null); })
+      .finally(() => { if (!cancelled) setIsVerifying(false); });
+    return () => { cancelled = true; };
   }, [isLoading, user, setUser]);
 
   // While the global auth check or server verification is in progress, show the loader.
@@ -89,9 +94,12 @@ const AuthPage = () => {
       return;
     }
 
-    if (!isLogin && formData.password !== formData.confirmPassword) {
-      setErrorMessage('Passwords do not match');
-      return;
+    if (!isLogin) {
+      const result = signupSchema.safeParse(formData);
+      if (!result.success) {
+        setErrorMessage(result.error.issues[0]?.message ?? 'Invalid input');
+        return;
+      }
     }
 
     try {
@@ -103,17 +111,22 @@ const AuthPage = () => {
             password: formData.password,
           });
         setUser(loggedInUser);
+        navigate('/dashboard', { replace: true });
       } else {
-        const { user: createdUser } = await signup({
+        // Signup returns needsVerification: true — no session issued yet
+        await signup({
             name: formData.name,
             email: formData.email,
             password: formData.password,
           });
-        setUser(createdUser);
+        navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`, { replace: true });
       }
-
-      navigate('/dashboard', { replace: true });
     } catch (error) {
+      // 403 needs_verification means a verified email is required before login
+      if (error instanceof Error && error.message.includes('verify your email')) {
+        navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`, { replace: true });
+        return;
+      }
       const message = error instanceof Error ? error.message : 'Unable to authenticate right now';
       setErrorMessage(message);
     } finally {
@@ -264,6 +277,7 @@ const AuthPage = () => {
                     name="name"
                     type="text"
                     required={!isLogin}
+                    autoComplete="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Brian O'Conner"
@@ -285,6 +299,7 @@ const AuthPage = () => {
                   name="email"
                   type="email"
                   required
+                  autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
@@ -305,6 +320,7 @@ const AuthPage = () => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -333,6 +349,7 @@ const AuthPage = () => {
                     name="confirmPassword"
                     type={showPassword ? 'text' : 'password'}
                     required={!isLogin}
+                    autoComplete="new-password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="••••••••"

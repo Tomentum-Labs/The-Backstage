@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
@@ -5,15 +6,18 @@ import { useAuth } from '@/context/AuthContext';
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   const handleLogout = async () => {
+    setLogoutError(null);
     try {
       await logout();
-    } catch {
-      // ignore API errors — still clear local state and redirect
+      setUser(null);
+      navigate('/auth', { replace: true });
+    } catch (error) {
+      // Don't clear local state — session may still be active on server
+      setLogoutError(error instanceof Error ? error.message : 'Logout failed. Please try again.');
     }
-    setUser(null);
-    navigate('/auth', { replace: true });
   };
 
   return (
@@ -25,9 +29,14 @@ const DashboardPage = () => {
               <p className="text-sm text-dark/60">Dashboard</p>
               <h1 className="text-3xl font-heading text-dark">Welcome to The Backstage</h1>
             </div>
-            <button type="button" className="btn-secondary" onClick={handleLogout}>
-              Log out
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button type="button" className="btn-secondary" onClick={handleLogout}>
+                Log out
+              </button>
+              {logoutError && (
+                <p className="text-xs text-red-600">{logoutError}</p>
+              )}
+            </div>
           </div>
         </header>
 

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(node -e \"const j = require\\('/d/Projects/The Backstage/backend/node_modules/jsonwebtoken/package.json'\\); console.log\\(j.version\\)\")",
+      "Bash(node -e \"const {PrismaClient} = await import\\('@prisma/client'\\); const p = new PrismaClient\\(\\); console.log\\(typeof p.passwordResetToken\\);\")",
+      "Bash(npm run:*)",
+      "Bash(npx prisma:*)",
+      "Bash(node -e \"import\\('express-rate-limit'\\).then\\(m => console.log\\(m.default.toString\\(\\).slice\\(0,200\\)\\)\\)\")",
+      "Bash(node -e ':*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
