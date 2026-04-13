@@ -43,7 +43,7 @@ function HomePage() {
       {/* Navigation */}
       <Navigation scrollY={scrollY} />
       
-      {/* Main content */}
+      {/* Main content  */}
       <main className="relative">
         <Hero />
         <SocialProof />
