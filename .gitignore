@@ -57,3 +57,6 @@ coverage/
 *.pem
 *.key
 *.cert
+
+# AI / Assistant
+.claude/

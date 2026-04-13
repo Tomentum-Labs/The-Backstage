@@ -23,7 +23,7 @@ app.use(
     credentials: true,
   }),
 );
-app.use(cookieParser());
+app.use(cookieParser(env.OAUTH_STATE_SECRET));
 app.use(express.json({ limit: '10kb' }));
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 

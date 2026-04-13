@@ -26,7 +26,7 @@ const ClosingCTA = () => {
   }, []);
 
   const benefits = [
-    'Free for 100 tickets',
+    'Free for non-ticketed events',
     'No setup fees',
     'Cancel anytime',
   ];

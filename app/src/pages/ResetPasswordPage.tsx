@@ -1,13 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Lock } from 'lucide-react';
-import { resetPassword } from '@/lib/auth';
+import { resetPassword, validateResetToken } from '@/lib/auth';
+import { resetPasswordSchema } from '@/lib/validation';
+import FullPageLoader from '@/components/FullPageLoader';
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = useMemo(() => searchParams.get('token') ?? '', [searchParams]);
 
+  const [tokenState, setTokenState] = useState<'checking' | 'valid' | 'invalid'>('checking');
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,18 +18,29 @@ const ResetPasswordPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Validate token on page load so we show an error state before the user fills in the form
+  useEffect(() => {
+    if (!token) {
+      setTokenState('invalid');
+      return;
+    }
+
+    let cancelled = false;
+    validateResetToken(token)
+      .then((valid) => { if (!cancelled) setTokenState(valid ? 'valid' : 'invalid'); })
+      .catch(() => { if (!cancelled) setTokenState('invalid'); });
+
+    return () => { cancelled = true; };
+  }, [token]);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
 
-    if (!token) {
-      setErrorMessage('Reset token is missing or invalid. Please request a new link.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorMessage('Passwords do not match.');
+    const result = resetPasswordSchema.safeParse({ password, confirmPassword });
+    if (!result.success) {
+      setErrorMessage(result.error.issues[0]?.message ?? 'Invalid input');
       return;
     }
 
@@ -44,6 +58,38 @@ const ResetPasswordPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (tokenState === 'checking') {
+    return <FullPageLoader label="Validating reset link..." />;
+  }
+
+  if (tokenState === 'invalid') {
+    return (
+      <div className="min-h-screen w-full bg-offwhite relative overflow-hidden flex items-center justify-center px-6 py-12">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-lime/15 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-dark/[0.04] blur-3xl" />
+        </div>
+        <div className="relative z-10 w-full max-w-sm rounded-2xl border border-offwhite/80 bg-offwhite/50 backdrop-blur-xl p-6 shadow-xl text-center">
+          <h1 className="font-heading font-bold text-dark text-2xl leading-tight">Link expired</h1>
+          <p className="mt-3 text-sm text-dark/60">
+            This reset link is invalid or has already been used. Please request a new one.
+          </p>
+          <Link
+            to="/auth/forgot-password"
+            className="mt-5 inline-block w-full btn-primary py-2.5 font-semibold text-sm text-center"
+          >
+            Request a new link
+          </Link>
+          <p className="mt-4 text-sm text-dark/65">
+            <Link to="/auth" className="font-semibold text-dark hover:underline">
+              Back to login
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-offwhite relative overflow-hidden flex items-center justify-center px-6 py-12">
@@ -82,15 +128,12 @@ const ResetPasswordPage = () => {
                 name="password"
                 type={showPassword ? 'text' : 'password'}
                 required
+                autoComplete="new-password"
                 value={password}
                 onChange={(event) => {
                   setPassword(event.target.value);
-                  if (errorMessage) {
-                    setErrorMessage('');
-                  }
-                  if (successMessage) {
-                    setSuccessMessage('');
-                  }
+                  if (errorMessage) setErrorMessage('');
+                  if (successMessage) setSuccessMessage('');
                 }}
                 placeholder="••••••••"
                 className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-dark/20 bg-offwhite/90 text-sm text-dark placeholder:text-dark/40 focus:outline-none focus:ring-2 focus:ring-lime/70 focus:border-transparent transition-all"
@@ -116,15 +159,12 @@ const ResetPasswordPage = () => {
                 name="confirmPassword"
                 type={showPassword ? 'text' : 'password'}
                 required
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(event) => {
                   setConfirmPassword(event.target.value);
-                  if (errorMessage) {
-                    setErrorMessage('');
-                  }
-                  if (successMessage) {
-                    setSuccessMessage('');
-                  }
+                  if (errorMessage) setErrorMessage('');
+                  if (successMessage) setSuccessMessage('');
                 }}
                 placeholder="••••••••"
                 className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-dark/20 bg-offwhite/90 text-sm text-dark placeholder:text-dark/40 focus:outline-none focus:ring-2 focus:ring-lime/70 focus:border-transparent transition-all"
