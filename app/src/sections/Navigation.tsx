@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 interface NavigationProps {
   scrollY: number;
@@ -9,22 +8,8 @@ interface NavigationProps {
 const Navigation = ({ scrollY }: NavigationProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isScrolled = scrollY > 100;
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const scrollToSection = (id: string) => {
-    if (location.pathname !== '/') {
-      navigate('/');
-      requestAnimationFrame(() => {
-        const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-          setIsMobileMenuOpen(false);
-        }
-      });
-      return;
-    }
-
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -33,11 +18,6 @@ const Navigation = ({ scrollY }: NavigationProps) => {
   };
 
   const goHome = () => {
-    if (location.pathname !== '/') {
-      navigate('/');
-      return;
-    }
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -78,35 +58,20 @@ const Navigation = ({ scrollY }: NavigationProps) => {
               Use Cases
             </button>
             <button
-              onClick={() => scrollToSection('pricing')}
+              onClick={() => scrollToSection('why-choose-us')}
               className="text-sm font-medium text-dark/70 hover:text-dark transition-colors"
             >
-              Pricing
-            </button>
-            <button
-              onClick={() => {
-                window.open('/docs/getting-started', '_blank', 'noopener,noreferrer');
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-sm font-medium text-dark/70 hover:text-dark transition-colors"
-            >
-              Docs
+              Why Choose Us
             </button>
           </div>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
             <button
-              onClick={() => navigate('/auth')}
-              className="text-sm font-medium text-dark/70 hover:text-dark transition-colors"
-            >
-              Log in
-            </button>
-            <button
-              onClick={() => navigate('/auth')}
+              onClick={() => scrollToSection('waitlist')}
               className="btn-primary text-sm py-2.5"
             >
-              Get started
+              Join Waitlist
             </button>
           </div>
 
@@ -134,44 +99,26 @@ const Navigation = ({ scrollY }: NavigationProps) => {
             Features
           </button>
           <button
-            onClick={() => scrollToSection('pricing')}
-            className="text-2xl font-heading font-bold text-dark"
-          >
-            Pricing
-          </button>
-          <button
             onClick={() => scrollToSection('usecases')}
             className="text-2xl font-heading font-bold text-dark"
           >
             Use Cases
           </button>
           <button
-            onClick={() => {
-              window.open('/docs/getting-started', '_blank', 'noopener,noreferrer');
-              setIsMobileMenuOpen(false);
-            }}
+            onClick={() => scrollToSection('why-choose-us')}
             className="text-2xl font-heading font-bold text-dark"
           >
-            Docs
+            Why choose Us
           </button>
           <div className="flex flex-col gap-4 mt-8">
             <button
               onClick={() => {
-                navigate('/auth');
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-lg font-medium text-dark/70"
-            >
-              Log in
-            </button>
-            <button
-              onClick={() => {
-                navigate('/auth');
+                scrollToSection('waitlist');
                 setIsMobileMenuOpen(false);
               }}
               className="btn-primary"
             >
-              Get started
+              Join Waitlist
             </button>
           </div>
         </div>

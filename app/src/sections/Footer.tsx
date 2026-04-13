@@ -2,9 +2,17 @@ import { Mail, Twitter, Linkedin, Instagram, ArrowUpRight } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
-    Product: ['Features', 'Pricing', 'Integrations', 'API', 'Changelog'],
-    Company: ['About', 'Blog', 'Careers', 'Press', 'Partners'],
-    Legal: ['Privacy', 'Terms', 'Security', 'Cookies'],
+    Product: [
+      { label: 'Features', href: '#features' },
+      { label: 'AI Management Suite', href: '#ai-management-suite' },
+      { label: 'Use Cases', href: '#usecases' },
+      { label: 'Why Choose Us', href: '#why-choose-us' },
+    ],
+    Launch: [
+      { label: 'Home', href: '#hero' },
+      { label: 'Join Waitlist', href: '#waitlist' },
+      { label: 'Contact', href: 'mailto:info@thebkstg.com' },
+    ],
   };
 
   return (
@@ -29,7 +37,7 @@ const Footer = () => {
               className="flex items-center gap-2 text-white/60 hover:text-lime transition-colors mb-6"
             >
               <Mail size={18} />
-              hello@thebackstage.co
+              info@thebkstg.com
             </a>
 
             {/* Social Links */}
@@ -56,7 +64,7 @@ const Footer = () => {
           </div>
 
           {/* Right Columns - Links */}
-          <div className="lg:w-2/3 grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-8">
             {Object.entries(footerLinks).map(([category, links]) => (
               <div key={category}>
                 <h4 className="font-heading font-semibold text-white mb-4">
@@ -64,12 +72,12 @@ const Footer = () => {
                 </h4>
                 <ul className="space-y-3">
                   {links.map((link) => (
-                    <li key={link}>
+                    <li key={link.label}>
                       <a
-                        href="#"
+                        href={link.href}
                         className="text-white/60 hover:text-lime transition-colors text-sm flex items-center gap-1 group"
                       >
-                        {link}
+                        {link.label}
                         <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </a>
                     </li>
@@ -85,20 +93,6 @@ const Footer = () => {
           <p className="text-white/40 text-sm">
             © {new Date().getFullYear()} The Backstage. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <a
-              href="#"
-              className="text-white/40 hover:text-white/60 transition-colors text-sm"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-white/40 hover:text-white/60 transition-colors text-sm"
-            >
-              Terms of Service
-            </a>
-          </div>
         </div>
       </div>
     </footer>

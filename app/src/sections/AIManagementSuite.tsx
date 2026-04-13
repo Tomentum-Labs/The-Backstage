@@ -28,13 +28,13 @@ const AIManagementSuite = () => {
       icon: Sparkles,
       title: 'AI Marketing Co-Pilot',
       description:
-        'Automatically generate high-converting promotional copy and identify target audience clusters for your email and WhatsApp campaigns.',
+        'Automatically generate high-converting promotional copy and identify target audience clusters for your marketing campaigns.',
     },
     {
       icon: MessageCircle,
       title: '24/7 WhatsApp Support Bot',
       description:
-        'An intelligent assistant that instantly answers attendee questions about parking, schedules, and gate times, 24/7.',
+        'An intelligent assistant that instantly answers attendee questions 24/7.',
     },
     {
       icon: ShieldAlert,
@@ -58,7 +58,7 @@ const AIManagementSuite = () => {
       icon: CalendarClock,
       title: 'Smart Logistics Planner',
       description:
-        'Input your event goals, and our AI will suggest optimal pricing tiers, venue capacities, and marketing timelines based on historical data.',
+        'Input your event goals, and our AI will suggest optimal pricing tiers, venue capacities, and marketing timelines.',
     },
   ];
 

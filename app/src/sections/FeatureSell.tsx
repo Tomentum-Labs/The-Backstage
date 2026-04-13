@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Globe, Share2, Store, ShoppingCart, CreditCard, QrCode } from 'lucide-react';
+import { Palette, Link2, Zap, Store, CreditCard, QrCode } from 'lucide-react';
 
 const FeatureSell = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -24,9 +24,21 @@ const FeatureSell = () => {
   }, []);
 
   const bullets = [
-    { icon: Globe, text: 'Embeds that match your brand' },
-    { icon: Share2, text: 'Social-friendly share links' },
-    { icon: Store, text: 'Box office mode for walk-ups' },
+    {
+      icon: Palette,
+      title: 'Custom styled checkout embeds',
+      description: 'Keep fans on your site with widgets that perfectly match your brand colors.',
+    },
+    {
+      icon: Link2,
+      title: 'High conversion social links',
+      description: 'Optimized, 1-click checkout URLs designed for sharing.',
+    },
+    {
+      icon: Zap,
+      title: 'Lightning fast Box Office POS',
+      description: 'A dedicated, high speed interface for gate staff to process walk-in sales in seconds.',
+    },
   ];
 
   return (
@@ -43,11 +55,10 @@ const FeatureSell = () => {
               className="font-heading font-bold text-dark mb-6"
               style={{ fontSize: 'clamp(28px, 2.4vw, 40px)' }}
             >
-              Sell anywhere
+              Sell tickets everywhere
             </h2>
             <p className="text-dark/70 text-lg leading-relaxed mb-8">
-              Embed checkout on your site, share a link, or sell at the door.
-              One system, every channel.
+              From your custom website to the front gate. Manage online drops and in-person sales from one unified dashboard.
             </p>
 
             {/* Bullets */}
@@ -55,27 +66,21 @@ const FeatureSell = () => {
               {bullets.map((bullet, i) => (
                 <li
                   key={i}
-                  className={`flex items-center gap-3 transition-all duration-600 ${
-                    isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                  className={`flex items-start gap-4 transition-all duration-600 ${
+                    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                   }`}
                   style={{ transitionDelay: `${(i + 1) * 100}ms` }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-lime/20 flex items-center justify-center flex-shrink-0">
-                    <bullet.icon size={18} className="text-dark" />
+                  <div className="w-10 h-10 rounded-full bg-lime/20 flex items-center justify-center flex-shrink-0 mt-1">
+                    <bullet.icon size={16} className="text-dark" />
                   </div>
-                  <span className="text-dark/80">{bullet.text}</span>
+                  <div>
+                    <div className="font-semibold text-dark">{bullet.title}</div>
+                    <div className="text-dark/60 text-sm">{bullet.description}</div>
+                  </div>
                 </li>
               ))}
             </ul>
-
-            {/* CTA */}
-            <button className="flex items-center gap-2 text-dark font-medium hover:text-lime-dark transition-colors group">
-              See sales tools
-              <ArrowRight
-                size={18}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </button>
           </div>
 
           {/* Tickets Display (Right) */}
@@ -151,18 +156,18 @@ const FeatureSell = () => {
               >
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-lime rounded-lg flex items-center justify-center">
-                    <ShoppingCart size={16} className="text-dark" />
+                    <Store size={16} className="text-dark" />
                   </div>
-                  <span className="text-sm font-medium text-dark">Quick Checkout</span>
+                  <span className="text-sm font-medium text-dark">Box Office POS</span>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs text-dark/60">
                     <CreditCard size={14} />
-                    <span>Apple Pay</span>
+                    <span>Card + Tap</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-dark/60">
                     <QrCode size={14} />
-                    <span>Instant QR</span>
+                    <span>Instant ticket QR</span>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
 import TextReveal from './sections/TextReveal';
@@ -9,18 +8,9 @@ import FeatureSell from './sections/FeatureSell';
 import AIManagementSuite from './sections/AIManagementSuite';
 import FeatureDashboard from './sections/FeatureDashboard';
 import WhyChooseUs from './sections/WhyChooseUs';
+import JoinWaitlist from './sections/JoinWaitlist';
 import UseCases from './sections/UseCases';
-import Pricing from './sections/Pricing';
-import ClosingCTA from './sections/ClosingCTA';
 import Footer from './sections/Footer';
-import DocsPage from './pages/DocsPage';
-import AuthPage from './pages/AuthPage';
-import DashboardPage from './pages/DashboardPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import FullPageLoader from './components/FullPageLoader';
-import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
 
 function HomePage() {
@@ -54,45 +44,15 @@ function HomePage() {
         <FeatureDashboard />
         <UseCases />
         <WhyChooseUs />
-        <Pricing />
-        <ClosingCTA />
+        <JoinWaitlist />
         <Footer />
       </main>
     </div>
   );
 }
 
-// Blocks rendering of protected pages until the initial auth check finishes.
-// This prevents the "flash of wrong page" and eliminates per-page session checks.
-function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth();
-  if (isLoading) return <FullPageLoader label="Loading..." />;
-  if (!user) return <Navigate to="/auth" replace />;
-  return <>{children}</>;
-}
-
 function App() {
-  return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/docs" element={<Navigate to="/docs/getting-started" replace />} />
-        <Route path="/docs/:sectionId" element={<DocsPage />} />
-      </Routes>
-    </AuthProvider>
-  );
+  return <HomePage />;
 }
 
 export default App;

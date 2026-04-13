@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Play } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const navigate = useNavigate();
+
+  const scrollToWaitlist = () => {
+    const waitlistSection = document.getElementById('waitlist');
+    if (waitlistSection) {
+      waitlistSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -62,13 +67,15 @@ const Hero = () => {
               }`}
             >
               <button
-                onClick={() => navigate('/auth')}
+                onClick={scrollToWaitlist}
                 className="btn-primary flex items-center gap-2"
               >
-                Get started free
+                Join Waitlist
                 <ArrowRight size={18} />
               </button>
-              <button className="btn-secondary flex items-center gap-2">
+              <button 
+                onClick={scrollToWaitlist}
+                className="btn-secondary flex items-center gap-2">
                 <Play size={16} />
                 See how it works
               </button>
