@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     await resend.emails.send({
-      from: 'no-reply@send.thebkstg.com',
+      from: 'The Backstage <no-reply@send.thebkstg.com>',
       to: normalizedEmail,
       subject: "You're on The Backstage waitlist",
       html: `<!DOCTYPE html>
@@ -90,7 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           <tr>
             <td style="padding-bottom:16px;">
               <p style="margin:0;font-size:16px;line-height:1.7;color:rgba(255,255,255,0.65);">
-                Thanks for joining the waitlist. We'll reach out as soon as your access is ready — expect product updates, early feature previews, and a front-row seat to what we're building.
+                Thanks for joining the waitlist. We'll reach out as soon as your access is ready. Expect product updates, early feature previews, and a front row seat to what we're building.
               </p>
             </td>
           </tr>
@@ -106,7 +106,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           <tr>
             <td style="border-top:1px solid rgba(255,255,255,0.1);padding-top:24px;">
               <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.3);">
-                The Backstage &nbsp;·&nbsp; No spam. Product updates only.
+                The Backstage
               </p>
             </td>
           </tr>
