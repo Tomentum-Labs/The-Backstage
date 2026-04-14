@@ -99,7 +99,7 @@ const FeatureSell = () => {
                 }}
               >
                 <img
-                  src="/ticket_3.png"
+                  src="/ticket_3_converted.avif"
                   alt="Festival Ticket"
                   className="w-full drop-shadow-xl"
                 />
@@ -118,7 +118,7 @@ const FeatureSell = () => {
                 }}
               >
                 <img
-                  src="/ticket_1.png"
+                  src="/ticket_1_converted.avif"
                   alt="Standard Ticket"
                   className="w-full drop-shadow-xl"
                 />
@@ -137,7 +137,7 @@ const FeatureSell = () => {
                 }}
               >
                 <img
-                  src="/ticket_2.png"
+                  src="/ticket_2_converted.avif"
                   alt="VIP Ticket"
                   className="w-full drop-shadow-2xl"
                 />

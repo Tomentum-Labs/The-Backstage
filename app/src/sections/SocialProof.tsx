@@ -38,7 +38,6 @@ const SocialProof = () => {
           <span className="bg-lime text-dark rounded-lg px-2 py-1 inline-block">all-in-one platform</span>
           {' '}that replaces your event management team, launching your branded ticketing site and automating daily operations with the{' '}
           <span className="bg-lime text-dark rounded-lg px-2 py-1 inline-block">AI Suite</span>
-          .&rdquo;
         </p>
       </div>
     </section>

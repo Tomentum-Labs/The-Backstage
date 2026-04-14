@@ -114,7 +114,7 @@ const Hero = () => {
                 }}
               >
                 <img
-                  src="/hero_3.jpg"
+                  src="/hero_3_converted.avif"
                   alt="Theater"
                   className="w-full h-full object-cover"
                 />
@@ -133,7 +133,7 @@ const Hero = () => {
                 }}
               >
                 <img
-                  src="/hero_2.jpg"
+                  src="/hero_2_converted.avif"
                   alt="Festival"
                   className="w-full h-full object-cover"
                 />
@@ -152,7 +152,7 @@ const Hero = () => {
                 }}
               >
                 <img
-                  src="/hero_1.jpg"
+                  src="/hero_1_converted.avif"
                   alt="Concert"
                   className="w-full h-full object-cover"
                 />
@@ -171,7 +171,7 @@ const Hero = () => {
                 }}
               >
                 <img
-                  src="/hero_4.jpg"
+                  src="/hero_4_converted.avif"
                   alt="Workshop"
                   className="w-full h-full object-cover"
                 />

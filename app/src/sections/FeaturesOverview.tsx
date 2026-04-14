@@ -55,7 +55,7 @@ const FeaturesOverview = () => {
           {/* Image (Left) */}
           <div className={`lg:w-1/2 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
             <div className="w-full h-[260px] md:h-[320px] lg:h-[420px] rounded-2xl overflow-hidden shadow-card">
-              <img src="/hero_1.jpg" alt="Features preview" className="w-full h-full object-cover" />
+              <img src="/hero_1_converted.avif" alt="Features preview" className="w-full h-full object-cover" />
             </div>
           </div>
 
