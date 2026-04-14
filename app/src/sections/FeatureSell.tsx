@@ -45,7 +45,7 @@ const FeatureSell = () => {
     <section ref={sectionRef} className="w-full bg-offwhite py-24">
       <div className="w-full max-w-6xl mx-auto px-8 lg:px-16">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-          {/* Text Block (Left) */}
+          {/* Text Block (Left)  */}
           <div
             className={`lg:w-1/2 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16'
