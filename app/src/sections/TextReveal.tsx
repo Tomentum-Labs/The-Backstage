@@ -68,7 +68,7 @@ const MobileTextReveal: React.FC = () => {
       {/* Lime orb */}
       <div
         className="absolute rounded-full bg-lime blur-3xl pointer-events-none"
-        style={{ right: '-8%', top: '6%', width: 140, height: 140, opacity: 0.13 }}
+        style={{ right: '-8%', top: '6%', width: 'clamp(70px, 20vw, 140px)', height: 'clamp(70px, 20vw, 140px)', opacity: 0.13 }}
       />
 
       <div className="relative w-full max-w-[92%] mx-auto px-2">

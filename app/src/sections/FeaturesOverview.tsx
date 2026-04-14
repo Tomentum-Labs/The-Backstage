@@ -44,10 +44,10 @@ const FeaturesOverview = () => {
   return (
     <section
       ref={sectionRef}
-      className="w-full bg-offwhite py-24"
+      className="w-full bg-offwhite py-16 lg:py-24"
       id="features"
     >
-      <div className="w-full max-w-6xl mx-auto px-8 lg:px-16">
+      <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 lg:px-16">
         {/* Heading moved into right column */}
 
         {/* Content Grid - Image left, texts right */}

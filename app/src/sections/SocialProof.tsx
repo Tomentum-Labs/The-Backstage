@@ -27,7 +27,7 @@ const SocialProof = () => {
       ref={sectionRef}
       className="w-full min-h-screen flex items-center justify-center"
     >
-      <div className="w-full max-w-5xl mx-auto px-8 lg:px-16 text-center">
+      <div className="w-full max-w-5xl mx-auto px-5 sm:px-8 lg:px-16 text-center">
         <p
           className={`font-heading font-bold text-dark leading-[1.25] tracking-tight transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'

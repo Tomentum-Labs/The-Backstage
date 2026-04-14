@@ -50,10 +50,10 @@ const UseCases = () => {
   return (
     <section
       ref={sectionRef}
-      className="w-full bg-offwhite py-24"
+      className="w-full bg-offwhite py-16 lg:py-24"
       id="usecases"
     >
-      <div className="w-full max-w-6xl mx-auto px-8 lg:px-16">
+      <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 lg:px-16">
         {/* Heading */}
         <div className="text-center mb-20 relative z-50">
           <h2
@@ -82,7 +82,7 @@ const UseCases = () => {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'
               }`}
               style={{
-                height: '380px',
+                minHeight: '280px',
                 transitionDelay: `${(i + 1) * 100}ms`,
               }}
             >

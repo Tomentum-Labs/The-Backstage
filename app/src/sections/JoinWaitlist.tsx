@@ -61,7 +61,7 @@ const JoinWaitlist = () => {
     <section
       id="waitlist"
       ref={sectionRef}
-      className="relative w-full min-h-screen py-24 overflow-hidden flex items-center"
+      className="relative w-full min-h-screen py-16 lg:py-24 overflow-hidden flex items-center"
       style={{
         backgroundImage: "url('/waitlist_background_converted.avif')",
         backgroundSize: 'cover',

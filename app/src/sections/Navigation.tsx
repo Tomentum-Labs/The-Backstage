@@ -93,7 +93,7 @@ const Navigation = ({ scrollY }: NavigationProps) => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-40 bg-offwhite transition-transform duration-500 md:hidden ${
+        className={`fixed inset-0 z-[9998] bg-offwhite transition-transform duration-500 md:hidden ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
