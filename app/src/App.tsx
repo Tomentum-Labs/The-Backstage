@@ -8,6 +8,7 @@ import FeatureSell from './sections/FeatureSell';
 import AIManagementSuite from './sections/AIManagementSuite';
 import FeatureDashboard from './sections/FeatureDashboard';
 import WhyChooseUs from './sections/WhyChooseUs';
+import FAQ from './sections/FAQ';
 import JoinWaitlist from './sections/JoinWaitlist';
 import UseCases from './sections/UseCases';
 import Footer from './sections/Footer';
@@ -44,6 +45,7 @@ function HomePage() {
         <FeatureDashboard />
         <UseCases />
         <WhyChooseUs />
+        <FAQ />
         <JoinWaitlist />
         <Footer />
       </main>

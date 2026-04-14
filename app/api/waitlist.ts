@@ -32,14 +32,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const sql = neon(process.env.DATABASE_URL!);
 
-    await sql`
-      CREATE TABLE IF NOT EXISTS waitlist (
-        id        SERIAL PRIMARY KEY,
-        email     TEXT UNIQUE NOT NULL,
-        joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `;
-
     const rows = await sql`
       INSERT INTO waitlist (email)
       VALUES (${normalizedEmail})

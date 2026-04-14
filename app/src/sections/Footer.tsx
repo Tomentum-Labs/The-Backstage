@@ -30,7 +30,7 @@ const Footer = () => {
               </h3>
             </div>
             <p className="text-white/60 mb-6 max-w-xs">
-              White-label ticketing for modern teams. Create, sell, and manage events with ease.
+              White label ticketing for modern teams. Create, sell, and manage events with ease.
             </p>
             <a
               href="mailto:hello@thebackstage.co"

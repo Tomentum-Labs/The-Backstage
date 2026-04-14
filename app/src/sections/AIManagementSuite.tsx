@@ -27,38 +27,32 @@ const AIManagementSuite = () => {
     {
       icon: Sparkles,
       title: 'AI Marketing Co-Pilot',
-      description:
-        'Automatically generate high-converting promotional copy and identify target audience clusters for your marketing campaigns.',
+      description: 'Your promo copy, written and targeted before your morning coffee.',
     },
     {
       icon: MessageCircle,
       title: '24/7 WhatsApp Support Bot',
-      description:
-        'An intelligent assistant that instantly answers attendee questions 24/7.',
+      description: 'Attendees get instant answers. You get your evenings back.',
     },
     {
       icon: ShieldAlert,
       title: 'Fraud & Scalper Detection',
-      description:
-        'Our anomaly detection algorithms silently monitor transactions in real-time to block bot networks and unauthorized resellers.',
+      description: 'Bots and scalpers blocked silently, before they do any damage.',
     },
     {
       icon: LineChart,
       title: 'Post-Event AI Analyst',
-      description:
-        'Wake up the morning after your event to a fully drafted executive summary covering sales velocity, demographics, and actionable insights.',
+      description: 'Wake up to a full event report. No spreadsheets, no manual work.',
     },
     {
       icon: Handshake,
       title: 'Sponsor Matchmaking',
-      description:
-        'Let AI generate custom pitch decks and recommend the perfect verified venues and sponsors based on your event demographic.',
+      description: 'The right sponsors, perfect verified venues found automatically.',
     },
     {
       icon: CalendarClock,
       title: 'Smart Logistics Planner',
-      description:
-        'Input your event goals, and our AI will suggest optimal pricing tiers, venue capacities, and marketing timelines.',
+      description: 'Tell it your goals. Get back a pricing, capacity, and timeline plan.',
     },
   ];
 

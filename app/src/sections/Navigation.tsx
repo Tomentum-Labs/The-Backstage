@@ -63,6 +63,12 @@ const Navigation = ({ scrollY }: NavigationProps) => {
             >
               Why Choose Us
             </button>
+            <button
+              onClick={() => scrollToSection('faq')}
+              className="text-sm font-medium text-dark/70 hover:text-dark transition-colors"
+            >
+              FAQ
+            </button>
           </div>
 
           {/* Desktop Actions */}
@@ -109,6 +115,12 @@ const Navigation = ({ scrollY }: NavigationProps) => {
             className="text-2xl font-heading font-bold text-dark"
           >
             Why choose Us
+          </button>
+          <button
+            onClick={() => scrollToSection('faq')}
+            className="text-2xl font-heading font-bold text-dark"
+          >
+            FAQ
           </button>
           <div className="flex flex-col gap-4 mt-8">
             <button
