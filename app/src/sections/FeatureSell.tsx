@@ -43,7 +43,7 @@ const FeatureSell = () => {
 
   return (
     <section ref={sectionRef} className="w-full bg-offwhite py-16 lg:py-24">
-      <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 lg:px-16">
+      <div className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-16">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           {/* Text Block (Left) */}
           <div

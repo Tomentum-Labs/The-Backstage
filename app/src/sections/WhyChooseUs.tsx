@@ -78,7 +78,7 @@ const WhyChooseUs = () => {
 
   return (
     <section ref={sectionRef} className="w-full bg-offwhite py-16 lg:py-24" id="why-choose-us">
-      <div className="w-full max-w-6xl mx-auto px-5 sm:px-8 lg:px-16">
+      <div className="w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-16">
         <div className="text-center mb-14">
           <h2
             className={`font-heading font-bold text-dark mb-4 transition-all duration-700 ${

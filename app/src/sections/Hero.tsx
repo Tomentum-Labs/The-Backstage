@@ -28,7 +28,7 @@ const Hero = () => {
       {/* Background gradient accent */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-bl from-lime/10 to-transparent pointer-events-none" />
       
-      <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-16 py-12 relative z-10">
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-16 py-12 relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Text Content (Left on desktop) */}
           <div className="lg:w-1/2 text-center lg:text-left">
