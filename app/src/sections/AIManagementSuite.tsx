@@ -90,8 +90,8 @@ const AIManagementSuite = () => {
   const stripRef      = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [active, setActive]       = useState(0);
+  const [prevActive, setPrevActive] = useState(0);
   const [paused, setPaused]       = useState(false);
-  const prevActiveRef             = useRef(0);
   const isMobile                  = useIsMobile();
 
   // Touch state
@@ -110,7 +110,7 @@ const AIManagementSuite = () => {
   }, []);
 
   const go = useCallback((next: number) => {
-    prevActiveRef.current = active;
+    setPrevActive(active);
     setActive(next);
   }, [active]);
 
@@ -144,7 +144,6 @@ const AIManagementSuite = () => {
     setTimeout(() => setPaused(false), 4000);
   }, [next, prev]);
 
-  const prevActive = prevActiveRef.current;
   const { sizes, gap } = config;
 
   return (
