@@ -37,7 +37,7 @@ const Footer = () => {
               className="flex items-center gap-2 text-white/60 hover:text-lime transition-colors mb-6"
             >
               <Mail size={18} />
-              info@thebkstg.com
+              hello@thebkstg.com
             </a>
 
             {/* Social Links */}

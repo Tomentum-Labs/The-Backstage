@@ -66,12 +66,12 @@ const FAQ = () => {
             className={`font-heading font-bold text-dark mb-4 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
-            style={{ fontSize: 'clamp(32px, 3vw, 48px)' }}
+            style={{ fontSize: 'clamp(26px, 3vw, 48px)' }}
           >
             Frequently asked questions
           </h2>
           <p
-            className={`text-dark/70 text-lg transition-all duration-700 delay-100 ${
+            className={`text-dark/70 text-base sm:text-lg transition-all duration-700 delay-100 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
             }`}
           >

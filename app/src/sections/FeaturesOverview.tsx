@@ -61,10 +61,10 @@ const FeaturesOverview = () => {
 
           {/* Texts (Right) - match image height; title moved here and aligned to image */}
           <div className={`lg:w-1/2 flex flex-col justify-start lg:h-[420px] px-2 lg:px-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
-            <h2 className="font-heading font-bold text-dark mb-4" style={{ fontSize: 'clamp(28px, 2.4vw, 40px)' }}>
+            <h2 className="font-heading font-bold text-dark mb-4" style={{ fontSize: 'clamp(23px, 2.4vw, 40px)' }}>
               Everything you need to sell tickets
             </h2>
-            <p className="text-dark/70 text-lg leading-relaxed mb-6">Sell tickets online and at the door with a single unified system, fast checkout, instant delivery, and support when you need it.</p>
+            <p className="text-dark/70 text-base sm:text-lg leading-relaxed mb-6">Sell tickets online and at the door with a single unified system, fast checkout, instant delivery, and support when you need it.</p>
 
             <div className="space-y-4">
               {features.map((feature, i) => (

@@ -81,11 +81,11 @@ const JoinWaitlist = () => {
           >
             <h2
               className="font-heading font-bold text-white mb-4"
-              style={{ fontSize: 'clamp(32px, 3.8vw, 52px)' }}
+              style={{ fontSize: 'clamp(26px, 3.8vw, 52px)' }}
             >
               Join the waitlist
             </h2>
-            <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto">
+            <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
               Be first in line to launch with The Backstage. We will notify you as soon as your access is ready.
             </p>
           </div>

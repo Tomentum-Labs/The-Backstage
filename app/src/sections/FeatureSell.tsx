@@ -53,11 +53,11 @@ const FeatureSell = () => {
           >
             <h2
               className="font-heading font-bold text-dark mb-6"
-              style={{ fontSize: 'clamp(28px, 2.4vw, 40px)' }}
+              style={{ fontSize: 'clamp(23px, 2.4vw, 40px)' }}
             >
               Sell tickets everywhere
             </h2>
-            <p className="text-dark/70 text-lg leading-relaxed mb-8">
+            <p className="text-dark/70 text-base sm:text-lg leading-relaxed mb-8">
               From your custom website to the front gate. Manage online drops and in-person sales from one unified dashboard.
             </p>
 

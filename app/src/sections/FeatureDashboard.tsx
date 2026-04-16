@@ -54,12 +54,12 @@ const FeatureUnified = () => {
             className={`font-heading font-bold text-dark mb-4 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
-            style={{ fontSize: 'clamp(34px, 3.6vw, 52px)' }}
+            style={{ fontSize: 'clamp(26px, 3vw, 48px)' }}
           >
             Handle everything from one place
           </h2>
                <p
-                  className={`text-dark/70 text-lg max-w-2xl mx-auto transition-all duration-700 ${
+                  className={`text-dark/70 text-base sm:text-lg max-w-2xl mx-auto transition-all duration-700 ${
                      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                   }`}
                >

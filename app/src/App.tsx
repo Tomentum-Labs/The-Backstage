@@ -53,7 +53,32 @@ function HomePage() {
   );
 }
 
+function NotFoundPage() {
+  return (
+    <div className="relative bg-offwhite min-h-screen flex flex-col items-center justify-center text-center px-6">
+      <div className="grain-overlay" />
+      <div className="relative z-10">
+        <p
+          className="text-[8rem] font-bold leading-none mb-4"
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            color: 'hsl(78,100%,62%)',
+            WebkitTextStroke: '2px hsl(78,60%,35%)',
+          }}
+        >404</p>
+        <h1 className="text-2xl font-semibold text-[#121212] mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Page not found</h1>
+        <p className="text-[#707070] mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>The page you're looking for doesn't exist.</p>
+        <a href="/" className="btn-primary inline-flex">
+          Back to home
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function App() {
+  const path = window.location.pathname;
+  if (path !== '/') return <NotFoundPage />;
   return <HomePage />;
 }
 
