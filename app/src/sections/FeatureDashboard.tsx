@@ -45,11 +45,11 @@ const FeatureUnified = () => {
   `;
 
   return (
-    <section ref={sectionRef} className="w-full bg-offwhite py-16 lg:py-24 overflow-hidden min-h-0 lg:min-h-[120vh] flex flex-col items-center justify-center">
+    <section ref={sectionRef} className="w-full bg-offwhite py-16 lg:py-24 overflow-visible lg:overflow-hidden min-h-0 lg:min-h-[120vh] flex flex-col items-center justify-center">
       <div className="w-full max-w-7xl mx-auto px-4">
         
         {/* HEADING */}
-        <div className="text-center mb-10 lg:mb-20 relative z-50">
+        <div className="text-center mb-14 lg:mb-20 relative z-50">
           <h2
             className={`font-heading font-bold text-dark mb-4 transition-all duration-700 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
@@ -67,46 +67,147 @@ const FeatureUnified = () => {
           </p>
         </div>
 
-            {/* Mobile: show only the main dashboard UI */}
-            <div className="lg:hidden w-full max-w-[500px] mx-auto -mt-6">
-               <div className="bg-white rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-dark/5 p-6 w-full h-[320px] flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-lime rounded-xl flex items-center justify-center shadow-sm">
-                           <BarChart3 size={20} className="text-dark" />
-                        </div>
-                        <div>
-                           <div className="font-bold text-dark text-lg leading-tight">Analytics</div>
-                           <div className="text-xs text-dark/60">Live Dashboard</div>
-                        </div>
-                     </div>
-                     <span className="flex items-center gap-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-100">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        LIVE
-                     </span>
-                  </div>
+            {/* Mobile: bento grid */}
+            <div className="lg:hidden w-full grid gap-3" style={{ gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'auto' }}>
 
-                  <div className="flex gap-2 mt-4">
-                     <div className="flex-1 bg-offwhite-dark rounded-xl p-2 text-center border border-dark/5">
-                        <div className="text-lg font-heading font-bold text-dark">$48k</div>
-                        <div className="text-[10px] text-dark/50 font-bold uppercase">Revenue</div>
-                     </div>
-                     <div className="flex-1 bg-offwhite-dark rounded-xl p-2 text-center border border-dark/5">
-                        <div className="text-lg font-heading font-bold text-dark">3.2k</div>
-                        <div className="text-[10px] text-dark/50 font-bold uppercase">Tickets</div>
-                     </div>
-                     <div className="flex-1 bg-offwhite-dark rounded-xl p-2 text-center border border-dark/5">
-                        <div className="text-lg font-heading font-bold text-dark">4.8</div>
-                        <div className="text-[10px] text-dark/50 font-bold uppercase">ROAS</div>
-                     </div>
+              {/* 1. Analytics — wide, spans 2 cols, light bg hero tile */}
+              <div className="col-span-2 bg-white border border-dark/5 rounded-3xl p-5 flex flex-col gap-3 overflow-hidden relative shadow-[0_2px_12px_rgb(0,0,0,0.06)]">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 bg-lime rounded-xl flex items-center justify-center">
+                      <BarChart3 size={18} className="text-dark" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-dark text-base leading-tight">Analytics</div>
+                      <div className="text-[10px] text-dark/50">Live Dashboard</div>
+                    </div>
                   </div>
+                  <span className="flex items-center gap-1.5 text-[9px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-100">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                    LIVE
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  {[{ v: '$48k', l: 'Revenue' }, { v: '3.2k', l: 'Tickets' }, { v: '4.8×', l: 'ROAS' }].map(({ v, l }) => (
+                    <div key={l} className="flex-1 bg-offwhite border border-dark/5 rounded-2xl p-2.5 text-center">
+                      <div className="text-base font-heading font-bold text-dark">{v}</div>
+                      <div className="text-[9px] text-dark/40 font-bold uppercase mt-0.5">{l}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-end gap-[3px] h-14">
+                  {[40, 55, 45, 70, 60, 85, 75, 90, 80, 95, 85, 100, 70, 60].map((h, i) => (
+                    <div key={i} className="flex-1 bg-lime rounded-t-sm" style={{ height: `${h}%` }} />
+                  ))}
+                </div>
+              </div>
 
-                  <div className="h-full flex items-end gap-1 px-1 mt-4 border-b border-dark/5 pb-1">
-                     {[40, 55, 45, 70, 60, 85, 75, 90, 80, 95, 85, 100, 70, 60].map((h, i) => (
-                        <div key={i} className="flex-1 bg-lime/60 rounded-t-sm transition-colors duration-300" style={{ height: `${h}%` }} />
-                     ))}
+              {/* 2. Revenue — lime accent tile */}
+              <div className="bg-lime rounded-3xl p-4 flex flex-col justify-between min-h-[140px]">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 bg-dark/10 rounded-xl flex items-center justify-center">
+                    <DollarSign size={15} className="text-dark" />
                   </div>
-               </div>
+                  <span className="text-[9px] font-bold text-dark/60 bg-dark/10 px-1.5 py-0.5 rounded-full">+12%</span>
+                </div>
+                <div>
+                  <div className="text-2xl font-heading font-bold text-dark leading-none">$156k</div>
+                  <div className="text-[10px] text-dark/50 font-medium mt-0.5">Total Revenue</div>
+                  <div className="h-1 w-full bg-dark/10 rounded-full overflow-hidden mt-2">
+                    <div className="h-full bg-dark w-[75%] rounded-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Active users — minimal stat tile */}
+              <div className="bg-white border border-dark/5 rounded-3xl p-4 flex flex-col justify-between min-h-[140px] shadow-[0_2px_12px_rgb(0,0,0,0.06)]">
+                <div className="w-8 h-8 bg-lime/20 rounded-xl flex items-center justify-center">
+                  <Zap size={15} className="text-dark" />
+                </div>
+                <div>
+                  <div className="text-3xl font-heading font-bold text-dark leading-none">428</div>
+                  <div className="text-[10px] text-dark/40 font-bold uppercase tracking-wide mt-1">Active Users</div>
+                  <div className="flex items-center gap-1 mt-2">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-[9px] text-green-600 font-bold">Right now</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Tickets — spans 2 cols, bar chart style */}
+              <div className="col-span-2 bg-white border border-dark/5 rounded-3xl p-5 shadow-[0_2px_12px_rgb(0,0,0,0.06)]">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-dark rounded-xl flex items-center justify-center">
+                      <Ticket size={14} className="text-lime" />
+                    </div>
+                    <span className="font-bold text-sm text-dark">Ticket Sales</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-dark/40">This month</span>
+                </div>
+                <div className="space-y-3">
+                  {[{ label: 'VIP', pct: 90, color: 'bg-lime' }, { label: 'General', pct: 65, color: 'bg-dark' }, { label: 'Student', pct: 40, color: 'bg-lime/40' }].map(({ label, pct, color }) => (
+                    <div key={label} className="flex items-center gap-3">
+                      <span className="text-[10px] font-bold text-dark/50 w-12 shrink-0">{label}</span>
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="text-[10px] font-bold text-dark w-7 text-right shrink-0">{pct}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 5. Schedule — tall left tile */}
+              <div className="bg-white border border-dark/5 rounded-3xl p-4 shadow-[0_2px_12px_rgb(0,0,0,0.06)]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Calendar size={13} className="text-dark" />
+                  <span className="font-bold text-xs text-dark">Schedule</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="bg-lime rounded-2xl p-2.5">
+                    <div className="text-[8px] font-bold text-dark/50 uppercase mb-0.5">Oct 15</div>
+                    <div className="text-xs font-bold text-dark leading-tight">Product Launch</div>
+                  </div>
+                  <div className="bg-offwhite-dark rounded-2xl p-2.5 opacity-60">
+                    <div className="text-[8px] font-bold text-dark/50 uppercase mb-0.5">Oct 28</div>
+                    <div className="text-xs font-bold text-dark leading-tight">Team Retreat</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 6. Payments — tall right tile */}
+              <div className="bg-dark rounded-3xl p-4 flex flex-col justify-between">
+                <div className="w-8 h-8 bg-lime rounded-xl flex items-center justify-center">
+                  <CreditCard size={14} className="text-dark" />
+                </div>
+                <div>
+                  <div className="text-xl font-heading font-bold text-white leading-none">$48,290</div>
+                  <div className="text-[9px] text-white/40 font-medium mt-1 mb-3">Processed</div>
+                  <div className="flex items-center gap-1.5 bg-green-400/10 border border-green-400/20 rounded-xl px-2 py-1.5">
+                    <CheckCircle size={10} className="text-green-400" />
+                    <span className="text-[9px] font-bold text-green-400">Operational</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 7. Campaigns — wide bottom tile */}
+              <div className="col-span-2 bg-white border border-dark/5 rounded-3xl p-4 flex items-center gap-4 shadow-[0_2px_12px_rgb(0,0,0,0.06)]">
+                <div className="w-10 h-10 bg-lime rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <Mail size={18} className="text-dark" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-sm text-dark">Newsletter Campaign</span>
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-lime w-[48%] rounded-full" />
+                  </div>
+                  <div className="text-[9px] text-dark/40 mt-1">48% open rate · 3.2k sent</div>
+                </div>
+              </div>
+
             </div>
 
             {/* Desktop: full overlapping cluster */}

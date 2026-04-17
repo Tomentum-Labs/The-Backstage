@@ -11,7 +11,7 @@ const Footer = () => {
     Launch: [
       { label: 'Home', href: '#hero' },
       { label: 'Join Waitlist', href: '#waitlist' },
-      { label: 'Contact', href: 'mailto:info@thebkstg.com' },
+      { label: 'Contact', href: 'mailto:hello@thebkstg.com' },
     ],
   };
 
