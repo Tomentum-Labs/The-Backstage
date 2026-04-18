@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Pacifico&family=Playfair+Display:ital,wght@1,400;1,700&family=DM+Serif+Display:ital@0;1&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -76,11 +76,11 @@
   }
   
   .btn-primary {
-    @apply rounded-xl px-6 py-3 font-medium transition-all duration-300 bg-lime text-dark hover:bg-lime-dark hover:shadow-lg hover:shadow-lime/30 hover:-translate-y-0.5;
+    @apply rounded-xl px-6 py-3 font-medium transition-all duration-300 bg-lime text-dark hover:bg-lime-dark hover:shadow-lg hover:shadow-lime/30 hover:-translate-y-0.5 shadow-[0_6px_16px_-4px_rgba(0,0,0,0.35)];
   }
-  
+
   .btn-secondary {
-    @apply rounded-xl px-6 py-3 font-medium transition-all duration-300 border border-dark/20 text-dark hover:bg-dark hover:text-offwhite;
+    @apply rounded-xl px-6 py-3 font-medium transition-all duration-300 border border-dark/20 text-dark hover:bg-dark hover:text-offwhite shadow-[0_6px_16px_-4px_rgba(0,0,0,0.2)];
   }
   
   .card-modern {

@@ -26,8 +26,8 @@ const FeatureSell = () => {
   const bullets = [
     {
       icon: Palette,
-      title: 'Custom styled checkout embeds',
-      description: 'Keep fans on your site with widgets that perfectly match your brand colors.',
+      title: 'Custom styled websites',
+      description: 'Keep fans on your site perfectly match your brand colors.',
     },
     {
       icon: Link2,
@@ -37,7 +37,7 @@ const FeatureSell = () => {
     {
       icon: Zap,
       title: 'Lightning fast Box Office POS',
-      description: 'A dedicated, high speed interface for gate staff to process walk-in sales in seconds.',
+      description: 'A dedicated, high speed interface for gate staff to process tickets in seconds.',
     },
   ];
 

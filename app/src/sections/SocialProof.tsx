@@ -25,7 +25,7 @@ const SocialProof = () => {
   return (
     <section
       ref={sectionRef}
-      className="w-full min-h-screen flex items-center justify-center"
+      className="w-full md:min-h-screen flex items-center justify-center pt-8 pb-20 md:py-0"
     >
       <div className="w-full max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
         <p
@@ -34,9 +34,13 @@ const SocialProof = () => {
           }`}
           style={{ fontSize: 'clamp(26px, 4.1vw, 56px)' }}
         >
-          &ldquo;The Backstage is the{' '}
+          &ldquo;<span style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>The Backstage</span> is the{' '}
           <span className="bg-lime text-dark rounded-lg px-2 py-1 inline-block">all-in-one platform</span>
-          {' '}that replaces your event management team, launching your branded ticketing site and automating daily operations with the{' '}
+          {' '}that <span style={{ fontFamily: "'DM Serif Display', serif", fontStyle: 'italic' }}>replaces</span> your{' '}
+          <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 700 }}>event management team,</span>{' '}
+          launching your{' '}
+          <span style={{ fontFamily: "'DM Serif Display', serif", fontStyle: 'italic' }}>branded ticketing site</span>{' '}
+          and <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>automating daily operations</span> with the{' '}
           <span className="bg-lime text-dark rounded-lg px-2 py-1 inline-block">AI Suite</span>
           &rdquo;
         </p>

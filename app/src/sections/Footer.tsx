@@ -1,4 +1,4 @@
-import { Mail, Twitter, Linkedin, Instagram, ArrowUpRight } from 'lucide-react';
+import { Mail, Facebook, Linkedin, Instagram, ArrowUpRight } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
@@ -46,7 +46,7 @@ const Footer = () => {
                 href="#"
                 className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/60 hover:bg-lime hover:text-dark transition-all"
               >
-                <Twitter size={18} />
+                <Facebook size={18} />
               </a>
               <a
                 href="#"
