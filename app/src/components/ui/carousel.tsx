@@ -93,11 +93,13 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
-    onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)
+    // Read initial scroll state once the api is ready
+    const timer = setTimeout(() => onSelect(api), 0)
 
     return () => {
+      clearTimeout(timer)
       api?.off("select", onSelect)
     }
   }, [api, onSelect])
