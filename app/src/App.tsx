@@ -38,7 +38,7 @@ function HomePage() {
         <Hero />
         <SocialProof />
         {/* <TextReveal /> */}
-        { /* <InfiniteZoomBento /> */ }
+        { /* <InfiniteZoomBento />  */ }
         <FeaturesOverview />
         <FeatureSell />
         <AIManagementSuite />
