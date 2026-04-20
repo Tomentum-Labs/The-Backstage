@@ -56,8 +56,7 @@ const Hero = () => {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              A white label ticketing system that looks like you built it, without
-              the engineering team.
+              Plan, create, and launch your fully branded event page. Start selling tickets today without the headache.
             </p>
 
             {/* CTA Row */}
@@ -79,18 +78,6 @@ const Hero = () => {
                 <Play size={16} />
                 See how it works
               </button>
-            </div>
-
-            {/* Badge */}
-            <div
-              className={`hidden sm:block transition-all duration-700 delay-400 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-dark/20 text-sm text-dark/60 bg-offwhite-dark">
-                <span className="w-2 h-2 rounded-full bg-lime animate-pulse" />
-                AI Powered Event Management <span className="w-2 h-2 rounded-full bg-lime animate-pulse" /> Setup in minutes
-              </span>
             </div>
           </div>
 

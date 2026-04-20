@@ -36,11 +36,7 @@ const SocialProof = () => {
         >
           &ldquo;<span style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>The Backstage</span> is the{' '}
           <span className="bg-lime text-dark rounded-lg px-2 py-1 inline-block">all-in-one platform</span>
-          {' '}that <span style={{ fontFamily: "'DM Serif Display', serif", fontStyle: 'italic' }}>replaces</span> your{' '}
-          <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 700 }}>event management team,</span>{' '}
-          launching your{' '}
-          <span style={{ fontFamily: "'DM Serif Display', serif", fontStyle: 'italic' }}>branded ticketing site</span>{' '}
-          and <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>automating daily operations</span> with the{' '}
+          {' '}that replaces your event management team, launching your branded ticketing site and automating daily operations with the{' '}
           <span className="bg-lime text-dark rounded-lg px-2 py-1 inline-block">AI Suite</span>
           &rdquo;
         </p>

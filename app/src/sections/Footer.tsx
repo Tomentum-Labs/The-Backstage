@@ -43,19 +43,25 @@ const Footer = () => {
             {/* Social Links */}
             <div className="flex items-center gap-3">
               <a
-                href="#"
+                href="https://www.facebook.com/profile.php?id=61572013387144"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/60 hover:bg-lime hover:text-dark transition-all"
               >
                 <Facebook size={18} />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/company/the-bkstg-com/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/60 hover:bg-lime hover:text-dark transition-all"
               >
                 <Linkedin size={18} />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/thebkstgcom/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white/60 hover:bg-lime hover:text-dark transition-all"
               >
                 <Instagram size={18} />

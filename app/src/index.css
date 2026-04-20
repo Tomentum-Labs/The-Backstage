@@ -34,6 +34,7 @@
     --sidebar-accent-foreground: 0 0% 7%;
     --sidebar-border: 0 0% 0% / 0.08;
     --sidebar-ring: 78 100% 62%;
+    --brand: 14 100% 57%;
   }
 }
 
@@ -44,7 +45,7 @@
   
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   @media (max-width: 639px) {
@@ -55,12 +56,12 @@
 
   #root {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   
   body {
     @apply bg-offwhite text-dark font-body antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100%;
   }
   
@@ -146,6 +147,37 @@
   
   .animate-float {
     animation: float 4s ease-in-out infinite;
+  }
+}
+
+/* ── InfiniteZoomBento: runs entirely on compositor thread ── */
+/*
+  view() timeline spans (sectionHeight + viewportHeight) = 400vh.
+  The sticky pin lives from 25% (section-top hits viewport-top)
+  to 75% (section-bottom hits viewport-bottom).
+  Embedding that window in the keyframes avoids relying on
+  animation-range fill-mode, which has inconsistent browser support.
+*/
+@keyframes bento-zoom {
+  0%, 25%   { transform: scale(var(--bento-zoom, 6)); }
+  75%, 100% { transform: scale(1); }
+}
+
+.bento-section {
+  view-timeline-name: --bento;
+  view-timeline-axis: block;
+}
+
+.bento-grid-wrapper {
+  transform-origin: center center;
+  will-change: transform;
+  transform: scale(1);
+}
+
+@supports (animation-timeline: scroll()) {
+  .bento-grid-wrapper {
+    animation: bento-zoom linear both;
+    animation-timeline: --bento;
   }
 }
 

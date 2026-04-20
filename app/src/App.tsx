@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Navigation from './sections/Navigation';
 import Hero from './sections/Hero';
 import TextReveal from './sections/TextReveal';
+import InfiniteZoomBento from './sections/InfiniteZoomBento';
 import SocialProof from './sections/SocialProof';
 import FeaturesOverview from './sections/FeaturesOverview';
 import FeatureSell from './sections/FeatureSell';
@@ -38,7 +39,8 @@ function HomePage() {
       <main className="relative">
         <Hero />
         <SocialProof />
-        <TextReveal />
+        {/* <TextReveal /> */}
+        { /* <InfiniteZoomBento /> */ }
         <FeaturesOverview />
         <FeatureSell />
         <AIManagementSuite />
