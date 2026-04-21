@@ -22,9 +22,7 @@ const Footer = () => {
           {/* Left Column - Brand */}
           <div className="lg:w-1/3">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-lime rounded-xl flex items-center justify-center">
-                <span className="font-heading font-bold text-dark text-lg">T</span>
-              </div>
+              <img src="/logo.png" alt="The Backstage" className="w-10 h-10 object-contain" />
               <h3 className="font-bold text-2xl text-white" style={{ fontFamily: 'Pacifico, cursive', letterSpacing: '0.06em' }}>
                 The Backstage
               </h3>

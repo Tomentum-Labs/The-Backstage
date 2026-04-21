@@ -37,8 +37,7 @@ function HomePage() {
       <main className="relative">
         <Hero />
         <SocialProof />
-        {/* <TextReveal /> */}
-        { /* <InfiniteZoomBento />  */ }
+        { /* <InfiniteZoomBento /> */ }
         <FeaturesOverview />
         <FeatureSell />
         <AIManagementSuite />
