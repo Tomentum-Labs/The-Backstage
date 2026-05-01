@@ -31,7 +31,7 @@ const Footer = () => {
               White label ticketing for modern teams. Create, sell, and manage events with ease.
             </p>
             <a
-              href="mailto:hello@thebackstage.co"
+              href="mailto:hello@thebkstg.com"
               className="flex items-center gap-2 text-white/60 hover:text-lime transition-colors mb-6"
             >
               <Mail size={18} />
